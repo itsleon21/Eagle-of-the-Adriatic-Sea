@@ -1,0 +1,34 @@
+/* Walnut veneer, aged brass, and compact instruments: keep the sea unobstructed. */
+body.is-playing{--wood:linear-gradient(90deg,#10090355,#6d452515 38%,#120b0755),url('/textures/walnut.svg');--wood-edge:#b18a5180}
+body.is-playing .flight-rail{display:contents}
+body.is-playing .telemetry,body.is-playing .mission-panel,body.is-playing .top-actions,body.is-playing .landing-assist,body.is-playing .flight-tools,body.is-playing .pause-card{background-image:var(--wood);background-color:#382317;background-size:auto,460px 180px;border:1px solid var(--wood-edge);box-shadow:inset 0 1px 0 #efc98d38,inset 0 0 0 3px #170f0966,0 4px 17px #101c2447;border-radius:6px;backdrop-filter:none}
+body.is-playing .telemetry{position:fixed;left:24px;bottom:24px;display:flex;gap:14px;padding:15px 18px 13px;z-index:7;width:322px;justify-content:space-between}
+body.is-playing .telemetry>div{min-width:62px}
+body.is-playing .telemetry small{font-size:8px;letter-spacing:1.4px;color:#e6cc9c}
+body.is-playing .telemetry b{font:31px/1 Georgia,serif;letter-spacing:-.7px;margin-top:9px;color:#fff1ce;text-shadow:0 2px 2px #0008}
+body.is-playing .telemetry i{height:34px;background:#d3ae6c38}
+body.is-playing .telemetry .primary-reading b{color:#ffe3a1}
+body.is-playing .throttle-track{width:48px}
+body.is-playing .flight-summary{display:none}
+body.is-playing .flight-tools{position:fixed;right:24px;bottom:24px;width:183px;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px;z-index:7}
+body.is-playing .flight-tools #camera{grid-column:auto}
+body.is-playing .flight-tools #help{grid-column:1/-1}
+body.is-playing .flight-tools button{font-size:10px;min-height:27px;padding:5px 7px;background:#1c160f4d;border-color:#d9b67d24;border-radius:3px}
+body.is-playing .flight-tools kbd{background:none;color:#c8ac79}
+body.is-playing .mission-panel{width:196px;padding:13px 15px;top:108px}
+body.is-playing .mission-panel .eyebrow{font-size:7px;color:#dcb979;letter-spacing:1.4px}
+body.is-playing .mission-panel h2,body.is-playing .mission-panel[data-mode=idle] h2{font-size:18px;margin-top:8px}
+body.is-playing .mission-bottom{margin-top:8px}
+body.is-playing .mission-bottom button{font-size:9px}
+body.is-playing .mission-panel[data-mode=idle] .mission-bottom:has(button:disabled){display:none}
+body.is-playing .top-actions{padding:7px 11px}
+body.is-playing .weather-selector select{background:#1c160f4d;border-color:#d9b67d38}
+body.is-playing .bottom-hint{left:25px;bottom:130px;width:max-content;max-width:310px;font-size:10px;padding:7px 10px;border-left:2px solid #d7b578;background:#251c15cf;color:#f7e8c6;line-height:1.6;border-radius:2px}
+body.is-playing .landing-assist{right:24px;bottom:156px;width:235px}
+body.is-playing .landing-assist h3{font-size:15px}
+body.is-playing .landing-heading>span{color:#d6b17a}
+body.is-playing .chart{background-color:#eee1c2;border:5px solid #62422b;border-radius:5px;box-shadow:0 6px 25px #141b2244,inset 0 0 0 1px #bc945a;width:min(330px,calc(100vh - 230px));top:110px;max-height:calc(100vh - 245px)}
+body.is-playing .mooring-hint,body.is-playing .toast{bottom:148px}
+body.is-playing .heading-system{background:none}
+@media(max-width:900px){body.is-playing .telemetry{left:18px;bottom:18px;width:300px;padding:13px 15px}body.is-playing .flight-tools{right:18px;bottom:18px}body.is-playing .bottom-hint{left:19px;bottom:118px}body.is-playing .landing-assist{right:18px;bottom:145px}}
+@media(max-width:650px){body.is-playing .telemetry{left:12px;bottom:12px;width:242px;gap:10px;padding:12px}body.is-playing .telemetry>div{min-width:46px}body.is-playing .telemetry b{font-size:26px}body.is-playing .telemetry small{font-size:7px;letter-spacing:.8px}body.is-playing .telemetry small em{font-size:6px;margin-left:0}body.is-playing .telemetry i{height:28px}body.is-playing .flight-tools{right:12px;bottom:12px;width:92px;grid-template-columns:1fr;padding:6px;gap:3px}body.is-playing .flight-tools #help{grid-column:auto}body.is-playing .flight-tools button{min-height:24px;font-size:9px}body.is-playing .bottom-hint{left:13px;bottom:105px;max-width:230px;font-size:9px}body.is-playing .landing-assist{right:12px;bottom:180px;width:202px}body.is-playing .chart{top:83px;width:min(calc(100vw - 24px),calc(100vh - 280px))}body.is-playing .mission-panel{width:180px;top:83px}body.is-playing .telemetry .throttle-track{width:38px}}

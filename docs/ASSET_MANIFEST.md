@@ -112,3 +112,23 @@ MC.72沿用原始自制材质贴图，依据用户新照片重建体量、尾翼
 ## v0.19（2026-10-29）
 
 三机型沿用原创脚本和几何，补充维护/停泊五金及M5布面翼肋，更新木纹和粗糙度贴图。art/build_aircraft.py、build_m5.py、build_mc72.py及对应.blend、视图、GLB保留；art/bake_aircraft_ao.py统一导出三架，包含UV修复、零面积面清理及大多边形三角化。AircraftGeometry.ts提供运行时切线保护，AircraftSurface.ts执行PBR调校和物理材质升级。三机型均为自包含GLB，小于12MiB；界面使用本地系统字体及CSS，无新增外部字体服务或第三方图像。
+
+## v0.24 新增程序资源
+
+- public/textures/walnut.svg：原创静态程序木纹，用于飞行界面。
+- src/world/VesselModel.ts：原创程序船体、甲板与帆具，静态部件按材质合并；港口小船合为单次绘制。没有导入外部船模或第三方贴图。
+- src/wood-flight.css：木质仪表与面板设计；网络参考仅用于布局原则，不复用参考游戏图像。
+
+## v0.25 竞速资产与天空（2026-10-30）
+
+- 原创制作脚本 `art/build_race_aircraft.py`；独立源模型 `art/racers/s6.blend`、`gloster6.blend`、`m67.blend`；运行资产 `public/models/race/*.glb`。材质颜色/粗糙度、散热面和翼肋纹理打包在GLB与源模型中，无外部下载纹理。历史照片与用户三张图仅用于观察，参考链接列于 `RACE_REFERENCES.md`。
+- 新增比赛目录、计时管理器、邀请/比赛界面、海上航门与原创粒子烟花，位于 `src/race/`。纪念赛性能为游戏调校，未使用厂商飞行数据作为真实飞行模拟。
+- `CloudVolumes.ts` 本地产生48³周期三维Worley密度纹理，并进行体积积分、云内遮光及前向散射；`Daylight.ts` 基于既有Three.js大气天空调整HDR辐射、日轮和远景。未下载HDRI、云贴图或调用外部天气服务。
+
+## v0.27 原创资源
+
+IslandIdentity.ts生成六岛码头静物，五种材料合批，无外部模型或纹理。AircraftLivery.ts保留既有纹理明暗，仅改变红色漆面；奖励配色为原创。AudioManager.ts内分机型声音、钟声和汽笛由Web Audio合成。摄影直接导出游戏帧，手册使用现有系统字体与木质/纸张风格；日志本地保存，不连接外部服务。
+
+## v0.28
+
+IslandDetails.ts内原创双臂石砌防波堤、条纹白色堤头小塔；TownHarborLights.ts内原创红绿航标灯，无外部模型或纹理。小镇装饰礁石使用同一无礁区规则过滤可视实例和碰撞。CloudLayout/CloudVolumes与TimeOfDay/Daylight继续使用工程内原创程序布局和三维密度材质，没有引入外部天空或云图片。

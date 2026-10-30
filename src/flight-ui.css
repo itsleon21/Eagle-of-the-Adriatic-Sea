@@ -1,0 +1,73 @@
+/* Flight deck: a quiet journal margin, an open view, and one shared instrument rail. */
+body.is-playing{--flight-margin:28px;--flight-panel:#142e32d9;--flight-rule:#ead4a24a;--flight-muted:#c5cfbf}
+body.is-playing .vignette{background:linear-gradient(180deg,#0d272c77,transparent 18%),linear-gradient(0deg,#112e3970,transparent 23%)}
+body.is-playing .topbar{top:24px;left:var(--flight-margin);right:var(--flight-margin);height:64px;align-items:center;gap:24px;pointer-events:none}
+body.is-playing .identity{display:flex;background:none;border:0;padding:0;gap:11px;box-shadow:none}
+body.is-playing .identity svg{width:25px;color:#f1d99f}
+body.is-playing .identity b{font:11px Georgia,serif;letter-spacing:1.45px}
+body.is-playing .identity span{font-size:9px;letter-spacing:3px;color:#dfdac8}
+body.is-playing .top-actions{pointer-events:auto;gap:12px;padding:8px 13px;background:var(--flight-panel);border:1px solid var(--flight-rule);border-radius:3px;box-shadow:0 4px 18px #09262a20;backdrop-filter:blur(12px);font-size:10px}
+body.is-playing .top-actions .top-hangar{display:none}
+body.is-playing .top-actions button{min-height:30px;padding:5px 2px;border:0}
+body.is-playing .weather-selector{gap:7px}
+body.is-playing .weather-selector>span{display:inline;color:var(--flight-muted);font-size:9px}
+body.is-playing .weather-selector select{background:#fff7db0c;border-color:#e8d9b63d;padding:5px 6px;font-size:11px}
+body.is-playing .time-selector small{display:inline;font:12px Georgia,serif;font-variant-numeric:tabular-nums}
+body.is-playing .heading-system{top:24px;width:340px;padding:4px 18px 0;background:none;border:0;text-shadow:0 1px 5px #102a2f}
+body.is-playing .compass-meta{justify-content:center;flex-wrap:wrap;gap:4px 16px}
+body.is-playing .compass-meta>span:first-child{font-size:0}
+body.is-playing .compass-meta b{font:23px Georgia,serif;color:#fff2d5;letter-spacing:1px;margin:0}
+body.is-playing #position-coordinates{font-size:8px;color:#e2decf}
+body.is-playing .compass-window{margin-top:8px;height:28px}
+body.is-playing .compass-mark{font-size:8px;color:#f0e4c8}
+body.is-playing .compass-index{border-top-color:#edbe6b}
+body.is-playing .mission-panel{top:115px;left:var(--flight-margin);width:236px;padding:16px 18px 14px;background:var(--flight-panel);border:1px solid var(--flight-rule);border-radius:3px;box-shadow:0 4px 18px #09262a20;backdrop-filter:blur(12px)}
+body.is-playing .mission-panel .eyebrow{font:8px Georgia,serif;letter-spacing:1.8px}
+body.is-playing .mission-panel h2{font:21px/1.4 'Songti SC',Georgia,serif;letter-spacing:1px;margin:11px 0 7px;color:#fff0d3}
+body.is-playing .mission-panel p{font-size:10px;line-height:1.8;color:#d0d6c7}
+body.is-playing .mission-bottom{margin-top:13px}
+body.is-playing .mission-bottom button{font-size:10px;padding:0 0 3px;border-bottom-color:#d8bd7a66;line-height:1.6}
+body.is-playing .mission-panel[data-mode=idle] p,body.is-playing .mission-panel:not([data-mode=running]) .checkpoint-progress{display:none}
+body.is-playing .mission-panel[data-mode=idle] h2{font-size:20px;margin-bottom:0}
+body.is-playing .mission-panel[data-mode=idle] .mission-bottom{margin-top:8px}
+body.is-playing .navigation{top:111px;left:50%;width:260px;padding:8px 14px;background:var(--flight-panel);border:1px solid var(--flight-rule);border-radius:3px;backdrop-filter:blur(12px)}
+body.is-playing .navigation>span{font-size:19px}
+body.is-playing .navigation small{display:inline;margin:0 0 0 9px;font:12px Georgia,serif;color:#e7d3a7}
+body.is-playing .navigation b{font-size:11px;margin-left:8px}
+body.is-playing .flight-rail{position:fixed;display:grid;grid-template-columns:auto minmax(140px,1fr) auto;align-items:center;column-gap:28px;left:var(--flight-margin);right:var(--flight-margin);bottom:24px;min-height:103px;padding:17px 23px;background:var(--flight-panel);border:1px solid var(--flight-rule);border-radius:3px;box-shadow:0 8px 30px #09262a2b;backdrop-filter:blur(12px);z-index:7}
+body.is-playing .telemetry{position:static;display:flex;gap:26px;min-height:0;margin:0;padding:0;background:none;border:0;box-shadow:none;left:auto;right:auto;bottom:auto}
+body.is-playing .telemetry>div{min-width:76px}
+body.is-playing .telemetry small{font-size:9px;letter-spacing:1.6px;color:#d1d5c2}
+body.is-playing .telemetry small em{font:8px Georgia,serif;letter-spacing:.5px;margin-left:3px;color:#e6d3a8;opacity:.85}
+body.is-playing .telemetry b{font:36px/.95 Georgia,serif;margin-top:10px;letter-spacing:-1px;color:#fff0d3;font-variant-numeric:tabular-nums}
+body.is-playing .telemetry .primary-reading b{color:#f4d391}
+body.is-playing .telemetry b>span{font-size:15px;letter-spacing:0}
+body.is-playing .telemetry i{height:37px;background:#dfd8b729}
+body.is-playing .throttle-track{width:62px;margin-top:6px;background:#f2e1b126}
+body.is-playing .flight-summary{padding-left:27px;border-left:1px solid #dfd8b729;min-width:0}
+body.is-playing .flight-summary>small{font:8px 'Avenir Next','PingFang SC',sans-serif;color:#ddcaa0;letter-spacing:1px;display:block;margin-bottom:6px}
+body.is-playing .flight-summary>strong{display:block;font:16px 'Songti SC',Georgia,serif;font-weight:400;letter-spacing:1px;margin-bottom:8px;white-space:nowrap}
+body.is-playing .flight-status{display:flex;gap:5px;align-items:center;font-size:9px;color:#d0d8c9;min-height:14px}
+body.is-playing .flight-status small{display:none}
+body.is-playing .status-dot{width:4px;height:4px;margin-right:2px;flex-shrink:0}
+body.is-playing .flight-tools{display:grid;grid-template-columns:repeat(3,minmax(79px,1fr));gap:5px 8px;width:288px}
+body.is-playing .flight-tools button{position:static;inset:auto;min-width:0;min-height:29px;padding:4px 7px;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;border:1px solid #e4d7b421;border-radius:2px;background:#f4e9c506;color:#eae5d0;font-size:10px;white-space:nowrap;transition:background .2s,border-color .2s}
+body.is-playing .flight-tools button:hover,body.is-playing .flight-tools button[aria-pressed=true],body.is-playing .flight-tools button[aria-expanded=true]{background:#ead4a21c;border-color:#e4c78a88;color:#ffe3a5}
+body.is-playing .flight-tools #camera{grid-column:span 2}
+body.is-playing kbd{border:0;border-radius:0;background:#f4e9c50a;padding:3px 4px;font-size:8px;line-height:1;margin:0;color:#c6d0c2}
+body.is-playing .bottom-hint{left:var(--flight-margin);bottom:141px;max-width:calc(100vw - 410px);font-size:10px;letter-spacing:.2px;line-height:1.8;padding:3px 0;color:#e7e6d1;text-shadow:0 1px 6px #102a2f}
+body.is-playing .landing-assist{top:auto;right:var(--flight-margin);bottom:147px;width:256px;padding:14px 17px;border:1px solid var(--flight-rule);border-radius:3px;background:var(--flight-panel);backdrop-filter:blur(12px);box-shadow:0 4px 18px #09262a20}
+body.is-playing .landing-heading{justify-content:space-between;margin-bottom:12px}
+body.is-playing .landing-heading>span{display:inline;font:8px Georgia,serif;letter-spacing:1.6px;color:#dfc68f}
+body.is-playing .landing-assist h3{font:16px 'Songti SC',Georgia,serif;margin:0 0 13px;color:#f4dfb4}
+body.is-playing .landing-readings{gap:15px}
+body.is-playing .landing-readings b{font-size:22px;margin:6px 0}
+body.is-playing .landing-assist p{line-height:1.7;padding-top:10px;font-size:10px}
+body.is-playing .chart{transform:none;max-height:calc(100vh - 245px);overflow:auto;top:106px;bottom:auto;right:var(--flight-margin);width:min(355px,calc(100vh - 255px));padding:20px;z-index:11}
+body.is-playing .mooring-hint{bottom:176px;max-width:60vw;padding:10px 18px;font-size:11px;z-index:8}
+body.is-playing .toast{bottom:180px;max-width:60vw;font-size:11px}
+@media(min-width:1600px){body.is-playing{--flight-margin:40px}body.is-playing .flight-rail{grid-template-columns:420px minmax(150px,1fr) 360px;padding:20px 30px;min-height:114px}body.is-playing .flight-tools{width:360px}body.is-playing .telemetry{gap:32px}body.is-playing .telemetry>div{min-width:88px}body.is-playing .telemetry b{font-size:42px}body.is-playing .bottom-hint{bottom:152px}body.is-playing .landing-assist{bottom:158px}}
+@media(max-width:1150px){body.is-playing{--flight-margin:22px}body.is-playing .heading-system{width:290px}body.is-playing .identity b{font-size:9px;letter-spacing:.7px}body.is-playing .identity span{font-size:8px;letter-spacing:2px}body.is-playing .identity svg{width:20px}body.is-playing .weather-selector>span{display:none}body.is-playing .top-actions{gap:9px}body.is-playing .flight-rail{column-gap:20px;padding:16px 19px}body.is-playing .telemetry{gap:20px}body.is-playing .telemetry>div{min-width:65px}body.is-playing .telemetry b{font-size:32px}body.is-playing .flight-summary{padding-left:20px}body.is-playing .flight-tools{width:258px;grid-template-columns:repeat(3,minmax(70px,1fr))}}
+@media(max-width:900px){body.is-playing{--flight-margin:18px}body.is-playing .identity{display:none}body.is-playing .topbar{justify-content:flex-end}body.is-playing .top-actions{width:auto}body.is-playing .heading-system{left:var(--flight-margin);transform:none;width:290px}body.is-playing .mission-panel{width:210px;top:108px;padding:13px 15px}body.is-playing .mission-panel h2{font-size:18px}body.is-playing .navigation{left:auto;right:var(--flight-margin);transform:none;width:230px;top:108px}body.is-playing .flight-summary{display:none}body.is-playing .flight-rail{grid-template-columns:1fr auto;column-gap:20px}body.is-playing .flight-tools{width:245px}body.is-playing .telemetry{gap:17px}body.is-playing .telemetry>div{min-width:57px}body.is-playing .telemetry b{font-size:30px}body.is-playing .bottom-hint{max-width:calc(100vw - 305px);font-size:9px}body.is-playing .landing-assist{width:238px}}
+@media(max-width:650px){body.is-playing{--flight-margin:12px}body.is-playing .topbar{top:13px;height:51px}body.is-playing .top-actions{gap:7px;padding:5px 8px;font-size:9px}body.is-playing .top-actions kbd,body.is-playing .time-selector small{display:none}body.is-playing .weather-selector select{font-size:10px;padding:4px}body.is-playing .heading-system{top:13px;width:170px;padding:2px 6px 0}body.is-playing .compass-meta b{font-size:20px}body.is-playing #position-coordinates{display:none}body.is-playing .compass-window{margin-top:6px;height:23px}body.is-playing .mission-panel{top:86px;width:188px;padding:11px 13px}body.is-playing .mission-panel .eyebrow{font-size:7px}body.is-playing .mission-panel h2{font-size:17px;margin-top:9px}body.is-playing .mission-bottom{margin-top:9px}body.is-playing .mission-panel p{display:none}body.is-playing .navigation{top:235px;width:188px;right:auto;left:var(--flight-margin);padding:8px;font-size:10px}body.is-playing .navigation small{font-size:10px}body.is-playing .flight-rail{bottom:12px;grid-template-columns:1fr;row-gap:13px;min-height:0;padding:14px 16px}body.is-playing .telemetry{justify-content:space-between;gap:12px}body.is-playing .telemetry>div{min-width:64px}body.is-playing .telemetry b{font-size:31px;margin-top:8px}body.is-playing .telemetry small{font-size:8px}body.is-playing .flight-tools{width:100%;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;padding-top:10px;border-top:1px solid #dfd8b729}body.is-playing .flight-tools #camera{grid-column:auto}body.is-playing .flight-tools button{font-size:9px;padding:5px;min-height:31px;justify-content:center}body.is-playing .flight-tools kbd{display:none}body.is-playing .bottom-hint{bottom:170px;max-width:calc(100vw - 24px);font-size:8px}body.is-playing .landing-assist{bottom:200px;width:202px;padding:12px;right:var(--flight-margin)}body.is-playing .landing-readings b{font-size:18px}body.is-playing .landing-assist h3{font-size:14px}body.is-playing .landing-heading>span{font-size:7px}body.is-playing .landing-assist p{font-size:9px}body.is-playing .chart{top:83px;width:min(calc(100vw - 24px),calc(100vh - 360px));padding:16px}body.is-playing .mooring-hint,body.is-playing .toast{bottom:202px;max-width:calc(100vw - 24px);font-size:10px}}
+@media(max-height:600px) and (min-width:651px){body.is-playing .topbar,body.is-playing .heading-system{top:12px}body.is-playing .mission-panel{top:92px}body.is-playing .navigation{top:92px}body.is-playing .flight-rail{bottom:12px;min-height:88px;padding-top:12px;padding-bottom:12px}body.is-playing .telemetry b{font-size:28px}body.is-playing .bottom-hint{bottom:111px}body.is-playing .landing-assist{bottom:125px}body.is-playing .chart{top:92px;width:min(320px,calc(100vh - 320px))}}

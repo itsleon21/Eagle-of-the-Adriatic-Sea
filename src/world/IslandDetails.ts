@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { islands, terrainHeight, random } from './WorldConfig.ts';
+import { islands, terrainHeight, random,bayProfile } from './WorldConfig.ts';
 import type { IslandDefinition } from './WorldConfig.ts';
 import {appendSurfacePolygon} from './TerrainSurface.ts';
 
@@ -7,7 +7,7 @@ export interface ShorePoint { x:number; z:number; y:number; nx:number; nz:number
 /** The quay and village follow the actual inner shoreline, rather than an unrelated grid. */
 export function waterfrontPoint(d:IslandDefinition, angle:number, inland=0):ShorePoint {
  if(d.id==='town'&&!d.canonical){const p=waterfrontPoint({...d,canonical:true},angle,inland);return{x:2*d.x-p.x,z:2*d.z-p.z,y:terrainHeight(d,2*d.x-p.x,2*d.z-p.z),nx:-p.nx,nz:-p.nz};}
- const nx=Math.cos(angle),nz=Math.sin(angle),cx=d.x,cz=d.z+d.rz*.62;
+ const nx=Math.cos(angle),nz=Math.sin(angle),cx=d.x,cz=d.z+d.rz*bayProfile(d).offset;
  let radius=10;
  for(;radius<d.rx*1.8;radius+=2){if(terrainHeight(d,cx+nx*radius,cz+nz*radius)>3.5)break;}
  radius+=inland;
@@ -17,6 +17,10 @@ export function waterfrontPoint(d:IslandDefinition, angle:number, inland=0):Shor
 export function inTakeoffChannel(d:IslandDefinition,x:number,z:number,padding=0) {
  return d.id==='harbor'&&Math.abs(z-d.z-510)<95+padding&&x>d.x-100-padding;
 }
+
+/** North-facing town harbour: keep its basin, mouth and approach free of decorative rocks. */
+export function inTownHarborApproach(d:IslandDefinition,x:number,z:number,padding=0){return d.id==='town'&&z<d.z-d.rz*.18+padding&&Math.abs(x-d.x)<d.rx*1.32+padding;}
+export const townBreakwaterArms=[[[-.45,.52],[-.50,.67],[-.50,.86],[-.42,.94]],[[.45,.52],[.50,.67],[.50,.86],[.42,.94]]];
 
 interface Instance { p:T.Vector3; s:T.Vector3; r:T.Euler; color?:T.Color }
 /** A few instanced batches contain the detail that would otherwise become thousands of draw calls. */
@@ -74,18 +78,19 @@ function harborDetails(d:IslandDefinition,b:DetailBuilder) {
  }
 
  // Timber jetties project into the northern half of the bay, leaving a broad open mouth.
- for(const a of[-2.73,-2.18,-1.62,-1.04,-.49]){
-  const p=waterfrontPoint(d,a,-3),length=50+rng()*24,angle=Math.atan2(-p.nx,-p.nz),cx=p.x-p.nx*length/2,cz=p.z-p.nz*length/2;
+ for(const a of(d.id==='town'?[-2.12,-1.45,-.63]:[-2.73,-2.18,-1.62,-1.04,-.49])){
+  const p=waterfrontPoint(d,a,-3),length=(d.id==='town'?32:50)+rng()*24,angle=Math.atan2(-p.nx,-p.nz),cx=p.x-p.nx*length/2,cz=p.z-p.nz*length/2;
   if(inTakeoffChannel(d,cx,cz,24)||p.y>28)continue;
   b.beam(cx,2.3,cz,7,1.4,length,angle);b.block(cx,.2,cz,3,4,length,angle,0x8f8c78,true);
   for(let j=0;j<length;j+=4){const x=p.x-p.nx*j,z=p.z-p.nz*j;b.beam(x,3.05,z,7.4,.18,.22,angle);if(j%12===0)for(const side of[-1,1]){b.post(x+side*p.nz*3.4,1.5,z-side*p.nx*3.4,.35,4.6);b.post(x+side*p.nz*2.6,3.5,z-side*p.nx*2.6,.26,.75);}}
   for(const side of[-1,1]){const x=p.x-p.nx*(length-14)+p.nz*side*10,z=p.z-p.nz*(length-14)-p.nx*side*10;b.beam(x,2.3,z,18,1.2,5,angle);}
  }
  // Two masonry arms shelter the basin while leaving the eastbound water runway open.
- const arms=[[[ -.45,.52],[-.50,.73],[-.40,.83],[-.22,.84]],[[.45,.52],[.46,.65],[.42,.75]]];
+ const arms=d.id==='town'?townBreakwaterArms:[[[-.45,.52],[-.50,.73],[-.40,.83],[-.22,.84]],[[.45,.52],[.46,.65],[.42,.75]]];
+ const facing=d.id==='town'?-1:1;
  for(const arm of arms){
   for(let i=1;i<arm.length;i++){
-   const a=new T.Vector2(d.x+arm[i-1][0]*d.rx,d.z+arm[i-1][1]*d.rz),end=new T.Vector2(d.x+arm[i][0]*d.rx,d.z+arm[i][1]*d.rz),length=a.distanceTo(end),segments=Math.ceil(length/12),angle=Math.atan2(end.x-a.x,end.y-a.y);
+   const a=new T.Vector2(d.x+arm[i-1][0]*d.rx*facing,d.z+arm[i-1][1]*d.rz*facing),end=new T.Vector2(d.x+arm[i][0]*d.rx*facing,d.z+arm[i][1]*d.rz*facing),length=a.distanceTo(end),segments=Math.ceil(length/12),angle=Math.atan2(end.x-a.x,end.y-a.y);
    for(let j=0;j<segments;j++){
     const t=(j+.5)/segments,x=T.MathUtils.lerp(a.x,end.x,t),z=T.MathUtils.lerp(a.y,end.y,t);if(inTakeoffChannel(d,x,z,18))continue;
     const ground=terrainHeight(d,x,z),top=Math.max(4.6,ground+.5);if(ground>15)continue;
@@ -94,7 +99,8 @@ function harborDetails(d:IslandDefinition,b:DetailBuilder) {
     if(j%2===0)for(const side of[-1,1])b.block(x+Math.cos(angle)*side*4.5,top+.8,z-Math.sin(angle)*side*4.5,.55,1.2,length/segments+.4,angle,0xc3b89e);
    }
   }
-  const end=arm[arm.length-1],x=d.x+end[0]*d.rx,z=d.z+end[1]*d.rz,h=Math.max(4.6,terrainHeight(d,x,z)+.5);if(!inTakeoffChannel(d,x,z,20)){b.block(x,h+2.0,z,2.8,4.0,2.8,0,0xe4dcc6,true);b.post(x,h+4.6,z,.85,1.2);}
+  const end=arm[arm.length-1],x=d.x+end[0]*d.rx*facing,z=d.z+end[1]*d.rz*facing,h=Math.max(4.6,terrainHeight(d,x,z)+.5);if(d.id==='town'){b.blockers.push(new T.Box3(new T.Vector3(x-2.2,h,z-2.2),new T.Vector3(x+2.2,h+6.1,z+2.2)));b.block(x,h+2.2,z,4.0,4.4,4.0,0,0xe8dfc8,true);b.block(x,h+4.0,z,4.08,.7,4.08,0,x>d.x?0xb84834:0x3e7768);b.block(x,h+5,z,3.2,1.2,3.2,0,0x54747b);b.block(x,h+5.8,z,4.2,.4,4.2,0,0x3e514c);b.block(x,h+3,z-2.03,1,2,.12,0,0x38463f);}
+  else if(!inTakeoffChannel(d,x,z,20)){b.block(x,h+2.0,z,2.8,4.0,2.8,0,0xe4dcc6,true);b.post(x,h+4.6,z,.85,1.2);}
  }
  for(let i=0;i<12;i++){
   const a=-Math.PI+.28+i/11*(Math.PI-.56),p=waterfrontPoint(d,a,17);if(p.y<1||p.y>28)continue;

@@ -1,7 +1,7 @@
 export interface IslandDefinition { id:string; name:string; x:number; z:number; rx:number; rz:number; height:number; seed:number; bay:boolean; canonical?:boolean }
 const islandTemplates:IslandDefinition[] = [
  {id:'harbor',name:'港口基地',x:-2400,z:1500,rx:525,rz:450,height:145,seed:13,bay:true},
- {id:'town',name:'海岸小镇',x:400,z:-2600,rx:560,rz:540,height:216,seed:37,bay:true},
+ {id:'town',name:'海岸小镇',x:400,z:-2600,rx:710,rz:620,height:216,seed:37,bay:true},
  {id:'lighthouse',name:'灯塔岛',x:3000,z:120,rx:310,rz:350,height:130,seed:63,bay:false},
  {id:'cove',name:'隐秘海湾',x:-2900,z:-2500,rx:400,rz:300,height:120,seed:81,bay:true},
  {id:'pine',name:'松林岛',x:-250,z:4000,rx:410,rz:380,height:160,seed:107,bay:false},
@@ -41,11 +41,12 @@ export const harbor=islands[0];
 export const harborRunway=Object.freeze({x:harbor.x,z:harbor.z+510,length:950,width:190});
 export const smooth=(a:number,b:number,x:number)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);};
 export const terrainSegments=(d:IslandDefinition)=>d.id.startsWith('reef-')?96:d.id==='coral'?128:192;
+export const bayProfile=(d:IslandDefinition)=>d.id==='town'?{offset:.72,rx:.52,rz:.27}:{offset:.62,rx:.43,rz:.48};
 /** Meter-scale distance from the sheltered bay shore, positive towards the land. */
 export function harborInlandDistance(d:IslandDefinition,x:number,z:number){
  if(d.id==='town'&&!d.canonical)return harborInlandDistance({...d,canonical:true},2*d.x-x,2*d.z-z);
- const dx=x-d.x,dz=z-d.z-d.rz*.62,r=Math.hypot(dx,dz),a=Math.atan2(dz,dx);
- const shore=1/Math.hypot(Math.cos(a)/(d.rx*.43),Math.sin(a)/(d.rz*.48));
+ const bay=bayProfile(d),dx=x-d.x,dz=z-d.z-d.rz*bay.offset,r=Math.hypot(dx,dz),a=Math.atan2(dz,dx);
+ const shore=1/Math.hypot(Math.cos(a)/(d.rx*bay.rx),Math.sin(a)/(d.rz*bay.rz));
  return r-shore;
 }
 /** Broad low waterfront, town terraces, then wooded uplands. All transitions are gentle ramps. */
@@ -91,7 +92,8 @@ export function terrainHeight(d:IslandDefinition,x:number,z:number) {
   return h;
  }
  const lx=x-d.x,lz=z-d.z, angle=Math.atan2(lz/d.rz,lx/d.rx);
- const coast=1+0.065*Math.sin(angle*5+d.seed)+0.04*Math.cos(angle*9+d.seed);
+ // The town is a broad, lopsided headland; the base retains its compact horseshoe.
+ const coast=d.id==='town'?1+.085*Math.sin(angle*2+.4)+.04*Math.sin(angle*3-1)+.025*Math.cos(angle*7):1+0.065*Math.sin(angle*5+d.seed)+0.04*Math.cos(angle*9+d.seed);
  const r=Math.hypot(lx/d.rx,lz/d.rz)/coast;
  if(r>1.08)return -30;
  const nx=lx/d.rx,nz=lz/d.rz;
@@ -118,10 +120,10 @@ export function terrainHeight(d:IslandDefinition,x:number,z:number) {
   h=-12+(1-smooth(.76,1.035,r))*(high+12);
   const inland=harborInlandDistance(d,x,z);
   const town=d.id==='town';
-  const terraces=harborTerraceHeight(inland*(town?.72:1));
+  const terraces=town?(-9+13.5*smooth(-38,18,inland)+13*smooth(78,150,inland)+20*smooth(220,320,inland)+34*smooth(390,510,inland)+28*smooth(560,700,inland)):harborTerraceHeight(inland);
   h=Math.min(h,terraces);
   if(!town)h+=54*gaussian(-.43,-.64,.20,.26)*smooth(155,270,inland);
-  else h+=175*gaussian(-.4,-.65,.26,.28)*smooth(200,350,inland);
+  else h+=125*gaussian(-.48,-.57,.31,.32)*smooth(260,410,inland)+65*gaussian(.36,-.68,.24,.20)*smooth(350,490,inland);
  }
  h=Math.min(d.height,h);
  if(d.id==='harbor'){

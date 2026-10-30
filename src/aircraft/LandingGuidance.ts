@@ -6,7 +6,7 @@ export const landingProfiles={
  mc72:{minKmh:160,maxKmh:210,setupMin:90,setupMax:140,flareHeight:7,maxApproachSink:2,maxTouchdownSink:1.1,maxBankDegrees:5},
  m5:{minKmh:80,maxKmh:105,setupMin:50,setupMax:80,flareHeight:4,maxApproachSink:1.8,maxTouchdownSink:1.1,maxBankDegrees:6},
 } as const;
-export const landingProfile=(id:AircraftId)=>landingProfiles[id];
+export const landingProfile=(id:AircraftId)=>landingProfiles[id==='s6'||id==='gloster6'||id==='m67'?'mc72':id];
 export interface LandingSnapshot{
  state:FlightState;speed:number;clearance:number;verticalSpeed:number;bank:number;pitch:number;throttle:number;
  overWater:boolean;clearAhead:boolean;landingCount:number;rolling?:boolean;

@@ -22,7 +22,7 @@ export class AircraftModel {
     this.propeller=new T.Group();this.propellers=[this.propeller];const plane=getAircraft(this.aircraftId),m5=this.aircraftId==='m5',group=new T.Group();
     const paint=new T.MeshPhysicalMaterial({color:plane.color,roughness:.34,clearcoat:.48,clearcoatRoughness:.19}),hullPaint=new T.MeshPhysicalMaterial({color:m5?0x713b24:0xb93424,roughness:m5?.42:.34,clearcoat:m5?.32:.48,clearcoatRoughness:.20}),cream=new T.MeshStandardMaterial({color:m5?0xe5e2d2:0xd2bd77,roughness:.6}),dark=new T.MeshStandardMaterial({color:0x493a2b,roughness:.7});
     const make=(g:T.BufferGeometry,m:T.Material,x:number,y:number,z:number)=>{const mesh=new T.Mesh(g,m);mesh.position.set(x,y,z);mesh.castShadow=true;group.add(mesh);return mesh;};
-    if(this.aircraftId==='mc72'){
+    if(['mc72','s6','gloster6','m67'].includes(this.aircraftId)){
       const body=make(new T.SphereGeometry(1,24,12),paint,0,.15,0);body.scale.set(.47,.55,3.95);
       make(new T.BoxGeometry(9.48,.13,1.6),paint,0,-.14,0);
       for(const side of[-1,1]){const f=make(new T.SphereGeometry(1,20,10),cream,side*1.18,-1.44,-.2);f.scale.set(.34,.38,3.25);make(new T.BoxGeometry(.05,1.25,.05),dark,side*1.18,-.7,-1);}

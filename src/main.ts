@@ -1,4 +1,8 @@
+import './journey/journey.css';
 import './style.css';
+import './flight-ui.css';
+import './wood-flight.css';
+import './race/race.css';
 import {Game} from './game/Game';
 const app=document.querySelector<HTMLElement>('#app')!;
 try{const game=new Game(app);window.addEventListener('pagehide',()=>game.dispose(),{once:true});}

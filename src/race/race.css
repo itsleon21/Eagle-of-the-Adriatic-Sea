@@ -1,0 +1,7 @@
+.race-offer-actions{display:flex;align-items:center;gap:24px;flex-wrap:wrap}.race-offer-actions .primary{text-decoration:none}#race-status{position:fixed;left:28px;top:110px;width:228px;padding:17px 19px;background:#392619 url('/textures/walnut.svg');border:1px solid #b18a5180;border-radius:5px;box-shadow:0 5px 20px #12242a55;color:#f3e2bd;z-index:9}#race-status small{font-size:9px;letter-spacing:1px;color:#d7b579}#race-status h2{font:19px 'Songti SC',Georgia,serif;margin:14px 0 10px}#race-timer{font:32px Georgia,serif;font-variant-numeric:tabular-nums;color:#ffe3a1}#race-status p{font-size:10px;margin:10px 0;line-height:1.7}#race-finish{border-top:1px solid #d4b87555;padding-top:12px;display:grid;gap:12px}#race-finish button,#race-finish a{font-size:11px;color:#f7dfad;text-align:left;text-decoration:none}.race-playing .mission-panel{display:none!important}@media(max-width:650px){#race-status{left:12px;top:83px;width:190px;padding:13px}}
+
+.race-exit{display:block;font-size:10px;color:#e7cb92;margin-top:13px;text-decoration:none;border-top:1px solid #d4b87544;padding-top:11px}
+
+#race-aircraft{font:12px Georgia,serif;color:#efd3a0;margin-top:8px}
+
+.ghost-option{display:flex;align-items:center;gap:7px;font-size:10px;color:#ead2ac;margin:12px 0}.ghost-option input{accent-color:#80cbd0}#race-sector{color:#a4e3dc}#race-laps{font-variant-numeric:tabular-nums}

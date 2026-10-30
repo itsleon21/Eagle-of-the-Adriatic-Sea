@@ -60,3 +60,12 @@ test('distant house proxies retain upward roof faces and distinct roof heights',
  }
  assert.ok(roofs>=12);
 });
+
+test('town neighbourhoods mix six silhouettes, warm facade palettes and varied proportions deterministically',()=>{
+ const plots=layouts[1].houses;
+ assert.equal(new Set(plots.map(p=>p.kind)).size,6);
+ assert.ok(new Set(plots.map(p=>p.tint.join(','))).size>=6);
+ assert.ok(Math.max(...plots.map(p=>p.height))/Math.min(...plots.map(p=>p.height))>2.2);
+ assert.ok(new Set(plots.map(p=>Math.round(p.angle*10))).size>15);
+ assert.ok(plots.filter(p=>p.kind==='HouseTownhouse').length<plots.length*.5);
+});

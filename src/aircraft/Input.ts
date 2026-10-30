@@ -10,8 +10,8 @@ export class Input {
     window.addEventListener('keydown', this.down); window.addEventListener('keyup', this.up); window.addEventListener('blur', this.blur); document.addEventListener('visibilitychange', this.visibility);
   }
   private down = (event: KeyboardEvent) => {
-    if (event.metaKey || event.altKey || (event.target instanceof HTMLElement && ['INPUT','SELECT','TEXTAREA','BUTTON'].includes(event.target.tagName))) return;
-    if (this.controlled.has(event.code) || ['KeyR','Escape','KeyH','KeyM','KeyC','KeyL','KeyV','KeyF','KeyI','KeyX','KeyZ'].includes(event.code)) event.preventDefault();
+    if (event.metaKey || event.altKey || (event.target instanceof HTMLElement && ['INPUT','SELECT','TEXTAREA','BUTTON'].includes(event.target.tagName)&&!['Escape','KeyP','KeyJ'].includes(event.code))) return;
+    if (this.controlled.has(event.code) || ['KeyJ','KeyP','KeyR','Escape','KeyH','KeyM','KeyC','KeyL','KeyV','KeyF','KeyI','KeyX','KeyZ'].includes(event.code)) event.preventDefault();
     this.keys.add(event.code); if (!event.repeat) this.action(event.code);
   };
   private up = (event: KeyboardEvent) => { this.keys.delete(event.code); };

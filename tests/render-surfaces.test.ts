@@ -32,7 +32,8 @@ test('lacquer has a smooth independent clearcoat while fabric and cavity shading
  const normal=new T.Texture(),rough=new T.Texture(),paint=new T.MeshPhysicalMaterial({name:'Hull lacquer',normalMap:normal,roughnessMap:rough,roughness:.6});paint.normalScale.set(.38,.38);
  prepareAircraftSurface(paint,true);assert.ok(paint.clearcoat>=.3&&paint.clearcoat<=.6);assert.ok(paint.clearcoatRoughness>=.16&&paint.clearcoatRoughness<=.24);assert.ok(paint.roughness>=.8);assert.equal(paint.clearcoatNormalMap,null);assert.ok(paint.normalScale.x<.25);assert.equal(paint.metalness,0);assert.equal(paint.vertexColors,false);
  const fabric=new T.MeshPhysicalMaterial({name:'M5 wing fabric',clearcoat:.8});prepareAircraftSurface(fabric,false);assert.equal(fabric.clearcoat,0);assert.ok(fabric.roughness>=.85&&fabric.roughness<=1);
- paint.dispose();fabric.dispose();normal.dispose();rough.dispose();
+ const alloy=new T.MeshPhysicalMaterial({name:'Brushed duralumin alloy',roughnessMap:rough});prepareAircraftSurface(alloy,false);assert.ok(alloy.roughness>=.9,'authored roughness must not be multiplied into a chrome-like surface twice');assert.equal(alloy.clearcoat,0);
+ paint.dispose();fabric.dispose();alloy.dispose();normal.dispose();rough.dispose();
 });
 
 test('imported steel and fabric become physical surfaces while keeping texture ownership and material flags',()=>{

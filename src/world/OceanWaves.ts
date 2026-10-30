@@ -1,4 +1,4 @@
-import {islands} from './WorldConfig.ts';
+import {islands,bayProfile} from './WorldConfig.ts';
 /** Shared directional wind-sea spectrum for geometry, normals, buoyancy, spray and wakes. */
 export const waveComponents=[
  {x:.9417419116,z:.336336397,k:Math.PI*2/76,speed:.90,weight:1,phase:0},
@@ -19,7 +19,7 @@ export function sampleOceanWaves(x:number,z:number,time:number,wind:number){
  const shelter=seaShelter(x,z);return{height:height*shelter.value,dx:dx*shelter.value+height*shelter.dx,dz:dz*shelter.value+height*shelter.dz,velocity:velocity*shelter.value};
 }
 const gl=(n:number)=>n.toFixed(12);
-const basins=islands.filter(d=>d.id==='harbor'||d.id==='town'||d.id==='cove').map(d=>({x:d.x,z:d.z+(d.id==='cove'?40:d.rz*.62*(d.id==='town'?-1:1)),rx:d.rx*.48,rz:d.rz*.42}));
+const basins=islands.filter(d=>d.id==='harbor'||d.id==='town'||d.id==='cove').map(d=>({x:d.x,z:d.z+(d.id==='cove'?40:d.rz*bayProfile(d).offset*(d.id==='town'?-1:1)),rx:d.rx*(d.id==='town'?.64:.48),rz:d.rz*(d.id==='town'?.26:.42)}));
 /** Gaussian wind shelter: calm enclosed basins blend continuously into offshore swell. */
 export function seaShelter(x:number,z:number){let value=1,dx=0,dz=0;for(const b of basins){const xx=(x-b.x)/b.rx,zz=(z-b.z)/b.rz,e=.62*Math.exp(-2*(xx*xx+zz*zz));value-=e;dx+=4*e*xx/b.rx;dz+=4*e*zz/b.rz;}return{value,dx,dz};}
 

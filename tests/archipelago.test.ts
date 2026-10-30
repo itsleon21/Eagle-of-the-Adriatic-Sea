@@ -5,7 +5,7 @@ import {addCoralBiome} from '../src/world/ArchipelagoDetails.ts';
 
 test('all six islands fit the extended chart and the five rebuilt footprints follow the reference',()=>{
  assert.equal(islands.length,6);assert.equal(WorldBounds.size,12000);
- for(const [id,width,depth,height] of[['harbor',1050,900,145],['town',1120,1080,216],['lighthouse',620,700,130],['pine',820,760,160],['coral',460,390,24]] as const){
+ for(const [id,width,depth,height] of[['harbor',1050,900,145],['town',1420,1240,216],['lighthouse',620,700,130],['pine',820,760,160],['coral',460,390,24]] as const){
   const d=islands.find(d=>d.id===id)!;assert.equal(d.rx*2,width);assert.equal(d.rz*2,depth);assert.equal(d.height,height);
  }
 });

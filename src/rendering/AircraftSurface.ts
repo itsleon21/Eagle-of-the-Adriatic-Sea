@@ -25,7 +25,7 @@ export function prepareAircraftSurface(material:T.MeshPhysicalMaterial,hasAO:boo
  }else if(/leather|interior|intake shadow/.test(name)){
   material.metalness=0;material.clearcoat=0;material.roughness=Math.max(.78,material.roughness);material.specularIntensity=.5;
  }else if(/steel|alloy|rigging|tension wire/.test(name)){
-  material.metalness=.82;material.roughness=/dark|steel|rigging|wire/.test(name)?.47:.32;material.clearcoat=0;material.anisotropy=.20;
+  material.metalness=.82;material.roughness=material.roughnessMap?.95:/dark|steel|rigging|wire/.test(name)?.47:.32;material.clearcoat=0;material.anisotropy=.20;
  }
  if(name.includes('glass')){
   material.color.setRGB(.90,.94,.93);material.opacity=.22;material.depthWrite=false;

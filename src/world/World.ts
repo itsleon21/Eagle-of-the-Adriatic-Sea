@@ -1,3 +1,7 @@
+import {TownHarborLights} from './TownHarborLights.ts';
+import {inTownHarborApproach} from './IslandDetails.ts';
+import {IslandIdentity} from './IslandIdentity.ts';
+import {buildHarborBoat} from './VesselModel.ts';
 import {distantIslandGeometry,addReefRocks} from './SmallIslands.ts';
 import {SeaTraffic} from './SeaTraffic.ts';
 import * as T from 'three';
@@ -19,7 +23,7 @@ import {buildSettlementLayout,layoutOccupied} from './SettlementLayout.ts';
 import {SettlementRenderer} from './SettlementRenderer.ts';
 import {terrainSurfaceHeight} from './TerrainSurface.ts';
 export class World {
- private traffic=new SeaTraffic();private outpostWindows:T.MeshStandardMaterial[]=[];readonly moorings:Moorings;private churches:Church[]=[];private beacon=new LighthouseBeacon();
+ private townHarborLights=new TownHarborLights();private traffic=new SeaTraffic();private outpostWindows:T.MeshStandardMaterial[]=[];readonly moorings:Moorings;private churches:Church[]=[];private beacon=new LighthouseBeacon();
  readonly root=new T.Group(); readonly ocean=new Ocean();private waterInteraction=new WaterInteraction(this.ocean);
  private settlements:SettlementRenderer[]=[];private coastalDetail:CoastalDetail;private birds=new Seabirds();
  private layouts=new Map(islands.map(d=>[d.id,buildSettlementLayout(d)]));
@@ -34,7 +38,7 @@ export class World {
   for(const d of islands){this.terrain(d);this.vegetation(d);if(d.id==='harbor'||d.id==='town')this.settlement(d);if(d.id==='lighthouse')this.lighthouse(d);}
   for(const d of reefs){this.terrain(d);addReefRocks(this.root,d,this.blockers);}
   addOutpostIslands(this.root,this.blockers);addMediterraneanPlants(this.root,this.occupied);this.arch();this.buoys();this.distantIslands();addIslandDetails(this.root,this.blockers,this.occupied);this.coastalDetail=new CoastalDetail(this.blockers,this.occupied);this.root.add(this.coastalDetail.root,this.birds.mesh);
-  const boat=this.mesh(new T.SphereGeometry(1,8,6),0xcac5a3,islands[0].x-700,1.2,islands[0].z+1000);boat.name='Harbor / offshore fishing boat';boat.scale.set(2.8,1.5,7);this.boats.push(boat);this.sailingBoat=boat;this.blockers.push(this.sailingBounds);this.updateSailingBoat();this.moorings=new Moorings(this.blockers);this.root.add(this.moorings.root,this.beacon.root);this.root.traverse(o=>{if(o instanceof T.Mesh&&o.userData.nightWindow)this.outpostWindows.push(o.material as T.MeshStandardMaterial);});
+  const boat=buildHarborBoat(2);boat.position.set(islands[0].x-700,0,islands[0].z+1000);boat.name='Harbor / offshore fishing boat';boat.scale.setScalar(.60);this.root.add(boat);this.boats.push(boat);this.sailingBoat=boat;this.blockers.push(this.sailingBounds);this.updateSailingBoat();this.moorings=new Moorings(this.blockers);this.root.add(this.townHarborLights.root,this.moorings.root,this.beacon.root,new IslandIdentity().root);this.root.traverse(o=>{if(o instanceof T.Mesh&&o.userData.nightWindow)this.outpostWindows.push(o.material as T.MeshStandardMaterial);});
 
  }
  private terrain(d:IslandDefinition){
@@ -72,7 +76,7 @@ export class World {
   let rockPlaced=0;
   for(let attempt=0;rockPlaced<rockCount&&attempt<rockCount*8;attempt++){
    const a=rng()*Math.PI*2,r=d.id==='coral'?.65+rng()*.55:.93+rng()*.22,x=d.x+Math.cos(a)*d.rx*r,z=d.z+Math.sin(a)*d.rz*r,h=terrainHeight(d,x,z);
-   if(inTakeoffChannel(d,x,z,45)||(d.id==='cove'&&x>d.x+130&&Math.abs(z-d.z+55)<85)||h>-.5)continue;
+   if(inTownHarborApproach(d,x,z,25)||inTakeoffChannel(d,x,z,45)||(d.id==='cove'&&x>d.x+130&&Math.abs(z-d.z+55)<85)||h>-.5)continue;
    const small=d.id==='coral',sx=(small?2:3)+rng()*(small?5:9),sy=(small?2:3)+rng()*(small?6:11),sz=(small?2:3)+rng()*(small?5:9);
    dummy.position.set(x,Math.max(-2,h-1),z);dummy.rotation.set(rng()*.5,rng()*6,rng()*.3);dummy.scale.set(sx,sy,sz);dummy.updateMatrix();rocks.setMatrixAt(rockPlaced,dummy.matrix);
    this.blockers.push(new T.Box3(new T.Vector3(x-sx*.72,dummy.position.y-sy*.65,z-sz*.72),new T.Vector3(x+sx*.72,dummy.position.y+sy*.75,z+sz*.72)));rockPlaced++;
@@ -84,11 +88,11 @@ export class World {
   const settlement=new SettlementRenderer(d,this.layouts.get(d.id)!,this.blockers);this.settlements.push(settlement);this.root.add(settlement.root);
   const church=new Church(d,this.blockers);this.churches.push(church);this.root.add(church.root);
   // Real boats sit beside each timber pier, with their bows aligned to the berth.
-  for(const a of[-2.73,-2.18,-1.62,-1.04,-.49]){
+  for(const a of(d.id==='town'?[-2.12,-1.45,-.63]:[-2.73,-2.18,-1.62,-1.04,-.49])){
    const p=waterfrontPoint(d,a,-28);if(p.y>25)continue;
    for(const side of[-1,1]){
     const x=p.x+p.nz*side*11,z=p.z-p.nx*side*11;
-    const boat=this.mesh(new T.SphereGeometry(1,8,6),side>0?0xe3d8b2:0x668b91,x,1.2,z);boat.scale.set(2.8,1.5,7);boat.rotation.y=Math.atan2(-p.nx,-p.nz);this.boats.push(boat);
+    const boat=buildHarborBoat(side>0?3:1);boat.position.set(x,0,z);boat.scale.setScalar(.55);this.root.add(boat);boat.rotation.y=Math.atan2(-p.nx,-p.nz);this.boats.push(boat);
    }
   }
  }
@@ -112,7 +116,7 @@ export class World {
   return{position:new T.Vector3(p.x+dx*c+dz*s,p.ground+7,p.z-dx*s+dz*c),target:new T.Vector3(p.x,p.ground+5,p.z)};
  }
  private updateSailingBoat(){const boat=this.sailingBoat;if(!boat)return;const a=this.time*.019;boat.position.x=islands[0].x-700+Math.cos(a)*130;boat.position.z=islands[0].z+1000+Math.sin(a)*85;boat.rotation.y=Math.atan2(Math.sin(a)*130,-Math.cos(a)*85);this.sailingBounds.min.set(boat.position.x-4,-1,boat.position.z-8);this.sailingBounds.max.set(boat.position.x+4,5,boat.position.z+8);}
- setTimeOfDay(dt:number,nightness:number){this.traffic.setNightness(nightness);for(const material of this.outpostWindows){material.emissive.setHex(0xffb35d);material.emissiveIntensity=T.MathUtils.smoothstep(nightness,.25,.8)*1.4;}for(const settlement of this.settlements)settlement.setNightness(nightness);this.beacon.update(dt,nightness);this.ocean.setBeacon(this.beacon.root.position,this.beacon.beamDirection,T.MathUtils.smoothstep(nightness,.15,.75));this.moorings.setNightness(nightness);for(const church of this.churches)church.setNightness(nightness);}
+ setTimeOfDay(dt:number,nightness:number){this.townHarborLights.setNightness(nightness);this.traffic.setNightness(nightness);for(const material of this.outpostWindows){material.emissive.setHex(0xffb35d);material.emissiveIntensity=T.MathUtils.smoothstep(nightness,.25,.8)*1.4;}for(const settlement of this.settlements)settlement.setNightness(nightness);this.beacon.update(dt,nightness);this.ocean.setBeacon(this.beacon.root.position,this.beacon.beamDirection,T.MathUtils.smoothstep(nightness,.15,.75));this.moorings.setNightness(nightness);for(const church of this.churches)church.setNightness(nightness);}
  updateView(position:T.Vector3){this.coastalDetail.updateView(position);for(const settlement of this.settlements)settlement.updateLOD(position);}
  heightAt(x:number,z:number){let h=-20;for(const d of allLandforms)h=Math.max(h,terrainSurfaceHeight(d,x,z));return h;}
  collides(from:T.Vector3,to:T.Vector3){

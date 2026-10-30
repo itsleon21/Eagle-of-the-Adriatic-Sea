@@ -1,5 +1,5 @@
 import {harborRunway} from '../world/WorldConfig.ts';
-export type AircraftId = 'redwing' | 'm5' | 'mc72';
+export type AircraftId = 'redwing' | 'm5' | 'mc72' | 's6' | 'gloster6' | 'm67';
 export interface FlightTuning {
   id: AircraftId; gravity: number; thrust: number; drag: number; linearDrag: number;
   maxSpeed: number; cruiseSpeed: number; liftSpeed: number; takeoffSpeed: number;

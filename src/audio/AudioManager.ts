@@ -1,21 +1,21 @@
 import type {Vector3} from 'three';
 import {islands} from '../world/WorldConfig';
 export class AudioManager {
- private surfGain?:GainNode;private forestGain?:GainNode;private birdClock=0;private birdDelay=7;private birdIndex=0;
+ private bellClock=0;private engineFilter?:BiquadFilterNode;private splashBuffer?:AudioBuffer;private surfGain?:GainNode;private forestGain?:GainNode;private birdClock=0;private birdDelay=7;private birdIndex=0;
  private context?:AudioContext;private master?:GainNode;private engine?:OscillatorNode;private engineGain?:GainNode;private windGain?:GainNode;private rainGain?:GainNode;
  muted=false;available=true;private volume=.42;
  async unlock(){
   try{
    if(!this.context){
     const ctx=this.context=new AudioContext();this.master=ctx.createGain();this.master.connect(ctx.destination);
-    this.engine=ctx.createOscillator();this.engine.type='sawtooth';this.engineGain=ctx.createGain();const filter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=310;
+    this.engine=ctx.createOscillator();this.engine.type='sawtooth';this.engineGain=ctx.createGain();const filter=this.engineFilter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=310;
     this.engine.connect(filter);filter.connect(this.engineGain);this.engineGain.connect(this.master);this.engine.start();
     const buffer=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),data=buffer.getChannelData(0);let last=0;
     for(let i=0;i<data.length;i++){last=(last+(Math.random()*2-1)*.04)/1.04;data[i]=last*3;}
     const source=ctx.createBufferSource();source.buffer=buffer;source.loop=true;const band=ctx.createBiquadFilter();band.type='lowpass';band.frequency.value=1200;
     this.windGain=ctx.createGain();source.connect(band);band.connect(this.windGain);this.windGain.connect(this.master);source.start();
     const rainBuffer=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),rainData=rainBuffer.getChannelData(0);for(let i=0;i<rainData.length;i++)rainData[i]=(Math.random()*2-1)*.35;
-    const rain=ctx.createBufferSource();rain.buffer=rainBuffer;rain.loop=true;const rainFilter=ctx.createBiquadFilter();rainFilter.type='lowpass';rainFilter.frequency.value=2900;this.rainGain=ctx.createGain();this.rainGain.gain.value=0;rain.connect(rainFilter);rainFilter.connect(this.rainGain);this.rainGain.connect(this.master);rain.start();
+    this.splashBuffer=rainBuffer;const rain=ctx.createBufferSource();rain.buffer=rainBuffer;rain.loop=true;const rainFilter=ctx.createBiquadFilter();rainFilter.type='lowpass';rainFilter.frequency.value=2900;this.rainGain=ctx.createGain();this.rainGain.gain.value=0;rain.connect(rainFilter);rainFilter.connect(this.rainGain);this.rainGain.connect(this.master);rain.start();
     // Both coastal wash and soft foliage share one looping source through separate filters.
     const surfFilter=ctx.createBiquadFilter();surfFilter.type='bandpass';surfFilter.frequency.value=430;surfFilter.Q.value=.5;this.surfGain=ctx.createGain();this.surfGain.gain.value=0;source.connect(surfFilter);surfFilter.connect(this.surfGain);this.surfGain.connect(this.master);
     const forestFilter=ctx.createBiquadFilter();forestFilter.type='highpass';forestFilter.frequency.value=1500;this.forestGain=ctx.createGain();this.forestGain.gain.value=0;source.connect(forestFilter);forestFilter.connect(this.forestGain);this.forestGain.connect(this.master);
@@ -26,10 +26,10 @@ export class AudioManager {
  }
  setVolume(value:number){this.volume=Math.max(0,Math.min(1,value));}
  toggle(){this.muted=!this.muted;return this.muted;}
- update(throttle:number,speed:number,onWater:boolean,paused:boolean,rain=0,wind=0){
+ update(throttle:number,speed:number,onWater:boolean,paused:boolean,rain=0,wind=0,aircraft='redwing'){
   if(!this.context||!this.master||!this.engine||!this.engineGain||!this.windGain)return;
   const t=this.context.currentTime;this.master.gain.setTargetAtTime(this.muted||paused?0:this.volume,t,.1);
-  this.engine.frequency.setTargetAtTime(32+throttle*63,t,.15);this.engineGain.gain.setTargetAtTime(.024+throttle*.045,t,.1);
+  const base=aircraft==='m5'?25:aircraft==='redwing'?34:46,range=aircraft==='m5'?44:aircraft==='redwing'?67:88,response=aircraft==='m5'?.35:.18;this.engine.frequency.setTargetAtTime(base+throttle*range-(onWater?3:0),t,response);this.engineFilter?.frequency.setTargetAtTime(240+throttle*(aircraft==='m5'?180:420)+speed*1.2,t,.25);this.engineGain.gain.setTargetAtTime(.024+throttle*.045,t,.1);
   this.rainGain?.gain.setTargetAtTime(rain*.17,t,.4);
   this.windGain.gain.setTargetAtTime(Math.min(.18,speed/400)+wind*.025+(onWater?Math.min(.06,speed/550):0),t,.1);
  }
@@ -37,6 +37,8 @@ export class AudioManager {
   if(!this.context||!this.master||!this.surfGain||!this.forestGain||dt<=0)return;
   let coast=0,forest=0;for(const d of islands){const r=Math.hypot((position.x-d.x)/d.rx,(position.z-d.z)/d.rz);coast=Math.max(coast,Math.exp(-(((r-.82)*3.5)**2)));if(d.id!=='coral')forest=Math.max(forest,Math.max(0,1-r));}
   const heightFade=Math.exp(-Math.max(0,position.y-8)/110),t=this.context.currentTime;
+  this.bellClock+=dt;const town=islands.find(i=>i.id==='town')!,harbor=islands.find(i=>i.id==='harbor')!,nearTown=Math.hypot(position.x-town.x,position.z-town.z)<900,nearHarbor=Math.hypot(position.x-harbor.x,position.z-harbor.z)<750;
+  if(this.bellClock>28&&heightFade>.2&&(nearTown||nearHarbor)){this.bellClock=0;const ctx=this.context,base=nearTown?440:110;for(const [n,ratio] of (nearTown?[1,2.71,4.13]:[1,1.5]).entries()){const tone=ctx.createOscillator(),gain=ctx.createGain();tone.type='sine';tone.frequency.value=base*ratio;tone.connect(gain);gain.connect(this.master);gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.035*heightFade/(n+1),t+.04);gain.gain.exponentialRampToValueAtTime(.0001,t+(nearTown?3.8:1.7));tone.start(t);tone.stop(t+4);tone.onended=()=>{tone.disconnect();gain.disconnect();};}}
   this.birdClock+=dt;this.surfGain.gain.setTargetAtTime(coast*heightFade*(.045+.018*Math.sin(this.birdClock*.7)),t,.8);this.forestGain.gain.setTargetAtTime(forest*heightFade*.08,t,.8);
   if(this.birdClock<this.birdDelay||heightFade<.12||coast<.25)return;
   this.birdDelay=this.birdClock+8+(this.birdIndex++%4)*2.7;
@@ -44,6 +46,10 @@ export class AudioManager {
   const ctx=this.context,o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.connect(g);g.connect(this.master);
   const pitch=920+(this.birdIndex%3)*130;o.frequency.setValueAtTime(pitch,t);o.frequency.exponentialRampToValueAtTime(pitch*1.55,t+.12);o.frequency.exponentialRampToValueAtTime(pitch*.86,t+.5);
   g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.018*heightFade*coast,t+.07);g.gain.exponentialRampToValueAtTime(.0001,t+.58);o.start(t);o.stop(t+.6);o.onended=()=>{o.disconnect();g.disconnect();};
+ }
+ touchdown(impact:number,speed:number){
+  if(!this.context||!this.master||!this.splashBuffer)return;
+  const ctx=this.context,t=ctx.currentTime,source=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),gain=ctx.createGain();source.buffer=this.splashBuffer;filter.type='lowpass';filter.frequency.value=900+Math.min(1800,speed*18);source.connect(filter);filter.connect(gain);gain.connect(this.master);const strength=Math.min(.28,.06+Math.max(0,impact)*.10+speed*.001);gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(strength,t+.035);gain.gain.exponentialRampToValueAtTime(.0001,t+.8);source.start(t);source.stop(t+.85);source.onended=()=>{source.disconnect();filter.disconnect();gain.disconnect();};
  }
  cue(kind:'checkpoint'|'complete'|'crash'|'splash'){
   if(!this.context||!this.master)return;try{

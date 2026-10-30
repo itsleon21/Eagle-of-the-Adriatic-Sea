@@ -1,12 +1,12 @@
 import * as T from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {islands,terrainHeight} from './WorldConfig.ts';
+import {islands,terrainHeight,bayProfile} from './WorldConfig.ts';
 import type {IslandDefinition} from './WorldConfig.ts';
 import {inTakeoffChannel} from './IslandDetails.ts';
 export interface MooringSite{id:string;name:string;x:number;z:number;shoreX:number;shoreZ:number;dx:number;dz:number;length:number;berth:T.Vector3;heading:number}
 export function findMooring(d:IslandDefinition):MooringSite{
  if(d.id==='town'&&!d.canonical){const p=findMooring({...d,canonical:true});return{...p,x:2*d.x-p.x,z:2*d.z-p.z,shoreX:2*d.x-p.shoreX,shoreZ:2*d.z-p.shoreZ,dx:-p.dx,dz:-p.dz,berth:new T.Vector3(2*d.x-p.berth.x,p.berth.y,2*d.z-p.berth.z),heading:p.heading+Math.PI};}
- const bay=d.id==='harbor'||d.id==='town'||d.id==='cove',cx=d.x,cz=d.z+(d.id==='cove'?25:bay?d.rz*.62:0);
+ const bay=d.id==='harbor'||d.id==='town'||d.id==='cove',cx=d.x,cz=d.z+(d.id==='cove'?25:bay?d.rz*bayProfile(d).offset:0);
  for(let attempt=0;attempt<64;attempt++){
   const a=bay?-2.6+attempt/64*1.9:Math.PI*.25+attempt/64*Math.PI*2,dx=Math.cos(a),dz=Math.sin(a);let r=bay?20:Math.max(d.rx,d.rz)*1.35,land=bay?0:1;
   for(let j=0;j<600;j++,r+=bay?1.5:-1.5){const h=terrainHeight(d,cx+dx*r,cz+dz*r);if((bay&&h>1.8)||(!bay&&h>1.8)){land=r;break;}}

@@ -58,7 +58,7 @@ export class Ocean {
     float shoreNoise=noise(p*.052+vec2(.1*time,0.));
     float shoreAA=max(.04,fwidth(bed)*1.5);
     float shallow=(1.-smoothstep(1.-shoreAA,16.+shoreAA,-bed));
-    vec3 sand=vec3(.025,.48,.42),deep=vec3(.009,.085,.135);
+    vec3 sand=vec3(.030,.56,.47),deep=vec3(.012,.115,.185);
     vec3 body=mix(deep,sand,shallow*.88);
     vec2 reefUV=(p-islands[${islands.findIndex(d=>d.id==='coral')}].xy)/islands[${islands.findIndex(d=>d.id==='coral')}].zw;
     float reefPatch=(1.-smoothstep(1.02,1.17,length(reefUV)))*smoothstep(.48,.68,noise(p*.034))*smoothstep(2.,5.,-bed)*(1.-smoothstep(12.,18.,-bed));

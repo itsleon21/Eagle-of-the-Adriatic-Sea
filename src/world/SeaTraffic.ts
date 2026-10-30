@@ -1,3 +1,4 @@
+import {buildVessel} from './VesselModel.ts';
 import * as T from 'three';
 import {islands,allLandforms,harborRunway} from './WorldConfig.ts';
 const step=120,size=101,origin=-6000;
@@ -16,14 +17,8 @@ let cachedRoutes:{from:string;to:string;curve:T.CatmullRomCurve3}[]|undefined;
 export function buildTrafficRoutes(){if(cachedRoutes)return cachedRoutes;const ports=islands.filter(d=>d.id!=='cove').map(d=>({id:d.id,point:new T.Vector3(d.x-d.rx*1.6-250,0,d.z)}));return cachedRoutes=ports.map((p,i)=>({from:p.id,to:ports[(i+1)%ports.length].id,curve:route(p.point,ports[(i+1)%ports.length].point)}));}
 export class SeaTraffic{
  readonly root=new T.Group();readonly routes=buildTrafficRoutes();readonly bounds:T.Box3[]=[];private vessels:{root:T.Group;route:number;offset:number;speed:number}[]=[];private lamps=new T.MeshBasicMaterial({color:0xffd18a,toneMapped:false});
- constructor(){this.root.name='Inter-island ferries / secret cove excluded';const cream=new T.MeshStandardMaterial({color:0xd9cfaf,roughness:.65}),hull=new T.MeshStandardMaterial({color:0x27464b,roughness:.58}),wood=new T.MeshStandardMaterial({color:0x826049,roughness:.75}),red=new T.MeshBasicMaterial({color:0xc73b24}),green=new T.MeshBasicMaterial({color:0x54a66b});
-  this.routes.forEach((r,index)=>{for(let direction=0;direction<4;direction++){const g=new T.Group();g.name=`${r.from} ↔ ${r.to} / ${direction>=2?'amber sailing yacht':direction?'fishing boat':'coastal ferry'}`;const add=(geo:T.BufferGeometry,m:T.Material,x:number,y:number,z:number)=>{const o=new T.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;g.add(o);return o;};const sailboat=direction>=2;const body=add(new T.SphereGeometry(1,16,8),hull,0,.5,0);body.scale.set(direction?2.5:3.4,1.25,direction?7:10);add(new T.BoxGeometry(direction?3:4.5,2.7,direction?4:9),cream,0,2.25,1);add(new T.BoxGeometry(4,.25,5),wood,0,3.7,1);add(new T.CylinderGeometry(.4,.5,2,8),hull,0,4.5,2);add(new T.BoxGeometry(2.8,.7,.08),this.lamps,0,2.8,-1.1);add(new T.SphereGeometry(.16,6,4),red,-2,3.8,0);add(new T.SphereGeometry(.16,6,4),green,2,3.8,0);if(sailboat){
-  // Remove the tall motor-boat superstructure; retain hull, deck and navigation lamps.
-  for(const child of [...g.children].slice(1,5))g.remove(child);
-  add(new T.BoxGeometry(3,1.4,5),cream,0,1.3,.8);add(new T.CylinderGeometry(.12,.18,15,8),wood,0,8.4,0);
-  const cloth=new T.MeshStandardMaterial({color:direction===2?0xf0a52e:0xeabc4e,roughness:.86,side:T.DoubleSide});
-  for(const side of[-1,1]){const vertices:number[]=[],faces:number[]=[];for(let row=0;row<=12;row++){const t=row/12,y=2.0+t*13.2,width=(1-t)*(side>0?6.8:4.7);for(let col=0;col<=10;col++){const u=col/10;vertices.push(Math.sin(u*Math.PI)*Math.sin((1-t)*Math.PI)*.9,y,side*width*u);}}for(let row=0;row<12;row++)for(let col=0;col<10;col++){const a=row*11+col;faces.push(a,a+1,a+11,a+1,a+12,a+11);}const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));geo.setIndex(faces);geo.computeVertexNormals();add(geo,cloth,0,0,0);}
- }
+ constructor(){this.root.name='Inter-island ferries / secret cove excluded';
+  this.routes.forEach((r,index)=>{for(let direction=0;direction<4;direction++){const g=buildVessel(direction>=2?'sailing':direction?'fishing':'ferry',index+direction,this.lamps);g.name=`${r.from} ↔ ${r.to} / ${direction>=2?'amber sailing yacht':direction?'fishing boat':'coastal ferry'}`;
  g.scale.setScalar(direction===0?1.55:direction===1?1.45:1.65);this.root.add(g);this.vessels.push({root:g,route:index,offset:direction*.25+index*.073,speed:direction>=2?3.6+direction*.25:direction?4.8:7.2});this.bounds.push(new T.Box3());}});this.update(0,()=>({height:0,dx:0,dz:0}));
  }
  setNightness(n:number){this.lamps.color.setRGB(1,.62,.28).multiplyScalar(.12+n*1.6);}

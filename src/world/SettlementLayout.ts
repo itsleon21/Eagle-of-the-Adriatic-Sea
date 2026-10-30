@@ -55,15 +55,15 @@ export function buildSettlementLayout(d:IslandDefinition):SettlementLayout {
  roads.push(mainRoad);
  const sidePlaza=waterfrontPoint(d,town?-.78:-2.42,16);plazas.push({x:sidePlaza.x,z:sidePlaza.z,radius:12,market:true});
 
- const anchors=town?[[-.36,-.12],[.30,-.11],[-.08,-.41],[.38,-.60],[-.34,-.64]]:[[-.38,-.08],[.34,-.16],[-.06,-.40],[-.36,-.60],[.29,-.61]];
+ const anchors=town?[[-.36,-.12],[.30,-.11],[-.08,-.41],[.38,-.60],[-.34,-.64],[.53,-.29],[-.54,-.31],[.13,-.48]]:[[-.38,-.08],[.34,-.16],[-.06,-.40],[-.36,-.60],[.29,-.61]];
  for(const [ax,az] of anchors){
   const x=d.x+ax*d.rx,z=d.z+az*d.rz,start=mainRoad.points.reduce((best,p)=>Math.hypot(p.x-x,p.z-z)<Math.hypot(best.x-x,best.z-z)?p:best),branch:VillageRoad={points:[],width:4.2};
-  for(let i=0;i<=18;i++){const t=i/18;branch.points.push({x:start.x+(x-start.x)*t,z:start.z+(z-start.z)*t+Math.sin(t*Math.PI)*9});}roads.push(branch);
+  for(let i=0;i<=18;i++){const t=i/18,dx=x-start.x,dz=z-start.z,len=Math.hypot(dx,dz)||1,bend=Math.sin(t*Math.PI)*(town?24*Math.sin(ax*9+az*6):9);branch.points.push({x:start.x+dx*t-(town?dz/len*bend:0),z:start.z+dz*t+(town?dx/len*bend:Math.sin(t*Math.PI)*9)});}roads.push(branch);
   plazas.push({x,z,radius:8});
  }
  function add(kind:HouseKind,district:District,x:number,z:number,angle:number){
-  const [bw,bh,bd]=dimensions[kind],scale=.88+rng()*.26;
-  const p:HousePlot={kind,district,x,z,width:bw*scale,height:bh*(.88+rng()*.25),depth:bd*(.9+rng()*.2),ground:0,low:0,angle,tint:[.89+rng()*.11,.88+rng()*.11,.86+rng()*.12]};
+  const [bw,bh,bd]=dimensions[kind],scale=town?.73+rng()*.55:.88+rng()*.26;
+  const p:HousePlot={kind,district,x,z,width:bw*scale,height:bh*((town?.74:.88)+rng()*(town?.66:.25)),depth:bd*((town?.80:.9)+rng()*(town?.42:.2)),ground:0,low:0,angle,tint:town?[[1,.88,.68],[.92,.97,.89],[1,.76,.60],[.80,.88,.83],[1,.98,.89],[.92,.82,.75]][Math.floor(rng()*6)]:[.89+rng()*.11,.88+rng()*.11,.86+rng()*.12]};
   if(district==='waterfront')p.width*=.84;
   if(inTakeoffChannel(d,x,z,55))return false;
   const radius=Math.hypot(p.width*.66,p.depth*.66);
@@ -86,13 +86,13 @@ export function buildSettlementLayout(d:IslandDefinition):SettlementLayout {
  const waterfrontClusters=town?[[-2.80,.28],[-2.14,.34],[-1.08,.26],[-.40,.17]]:[[-2.79,.22],[-2.03,.29],[-.97,.26],[-.34,.15]];
  let index=0;
  for(const [center,spread] of waterfrontClusters){
-  for(let i=0;i<34;i++){
-   const a=center+(rng()-.5)*spread*2,p=waterfrontPoint(d,a,22+rng()*18),kind:HouseKind=town?(index%5===0?'HouseArcade':index%3===0?'HouseTerrace':'HouseTownhouse'):(a< -2.1?(index%4===0?'HouseWorkshop':'HouseFisher'):(index%4===0?'HouseArcade':index%3===0?'HouseTownhouse':'HouseTerrace'));
+  for(let i=0;i<(town?64:34);i++){
+   const a=center+(rng()-.5)*spread*2,p=waterfrontPoint(d,a,22+rng()*18),kind:HouseKind=town?houseKinds[[2,1,0,5,4,1,3,0][index%8]]:(a< -2.1?(index%4===0?'HouseWorkshop':'HouseFisher'):(index%4===0?'HouseArcade':index%3===0?'HouseTownhouse':'HouseTerrace'));
    add(kind,'waterfront',p.x,p.z,Math.atan2(-p.nx,-p.nz)+(rng()-.5)*.16);index++;
   }
  }
  // A few second-line pockets read as back lanes, not another continuous ring.
- for(const center of(town?[-2.7,-2.1,-.95,-.45]:[-2.75,-2.2,-.65]))for(let i=0;i<34;i++){
+ for(const center of(town?[-2.7,-2.1,-1.55,-.95,-.45]:[-2.75,-2.2,-.65]))for(let i=0;i<(town?64:34);i++){
   const a=center+(rng()-.5)*.34,p=waterfrontPoint(d,a,66+rng()*54);
   add(rng()<.40?'HouseFisher':rng()<.55?'HouseTerrace':'HouseTownhouse','village',p.x,p.z,Math.atan2(-p.nx,-p.nz)+(rng()-.5)*.25);
  }
@@ -100,11 +100,13 @@ export function buildSettlementLayout(d:IslandDefinition):SettlementLayout {
 
  for(let k=0;k<anchors.length;k++){
   const [ax,az]=anchors[k],cx=d.x+ax*d.rx,cz=d.z+az*d.rz;
-  for(let i=0;i<(town?145:125);i++){
-   const theta=rng()*Math.PI*2,r=Math.sqrt(rng()),x=cx+Math.cos(theta)*r*(town?67:60),z=cz+Math.sin(theta)*r*(town?54:48);
-   const district:District=k<3?'village':'hillside',kind:HouseKind=k<3?(town?(rng()<.60?'HouseTownhouse':rng()<.65?'HouseTerrace':'HouseFisher'):(rng()<.4?'HouseTerrace':rng()<.4?'HouseTownhouse':'HouseFisher')):(rng()<.65?'HouseVilla':'HouseFisher');
+  for(let i=0;i<(town?400:125);i++){
+   const theta=rng()*Math.PI*2,r=Math.sqrt(rng()),x=cx+Math.cos(theta)*r*(town?75+(k%3)*24:60),z=cz+Math.sin(theta)*r*(town?55+(k%4)*16:48);
+   const district:District=(k<3||k>4)?'village':'hillside',kind:HouseKind=(k<3||k>4)?(town?houseKinds[[1,0,5,3,1,2,4][Math.floor(rng()*7)]]:(rng()<.4?'HouseTerrace':rng()<.4?'HouseTownhouse':'HouseFisher')):(rng()<.65?'HouseVilla':'HouseFisher');
    if(district==='hillside'&&rng()<.33)continue;
-   add(kind,district,x,z,Math.atan2(x-d.x,d.z+d.rz*.4-z)+(rng()-.5)*.55);
+   let angle=Math.atan2(x-d.x,d.z+d.rz*.4-z)+(rng()-.5)*.55;
+   if(town){let nearest=Infinity;for(const road of roads)for(let j=1;j<road.points.length;j++){const a=road.points[j-1],b=road.points[j],dist=segmentDistance(x,z,a,b);if(dist<nearest){nearest=dist;angle=Math.atan2(b.x-a.x,b.z-a.z)+Math.PI/2+(rng()-.5)*.32;}}}
+   add(kind,district,x,z,angle);
   }
  }
  // A few isolated upper plots complete the hillside hamlets without filling the intervening woodland.

@@ -34,7 +34,7 @@ export class IslandSurface {
     float grain=dot(vec3(texture2D(islandGrain,vIslandSurface.yz*.07).r,texture2D(islandGrain,vIslandSurface.xz*.07).r,texture2D(islandGrain,vIslandSurface.xy*.07).r),islandNormal);
     float mottling=texture2D(islandGrain,vIslandSurface.xz*.0031).r;
     ${terrain?`float cliff=smoothstep(.12,.48,1.-surfaceNormal.y);
-    vec3 rock=mix(vec3(.38,.31,.21),vec3(.62,.51,.34),mottling);
+    vec3 rock=mix(vec3(.46,.39,.28),vec3(.70,.60,.43),mottling);
     float strataPhase=vIslandSurface.y*.32+mottling*4.+grain*.65;
     float strataAA=max(.03,fwidth(strataPhase));
     float strata=sin(strataPhase)/(1.+strataAA*strataAA*4.);
@@ -42,8 +42,8 @@ export class IslandSurface {
     float weathering=texture2D(islandGrain,cliffUV).r;
     rock*=.88+.13*strata+.16*weathering;
     rock=mix(rock,rock*vec3(.76,.79,.74),smoothstep(.57,.68,weathering)*.45);
-    vec3 grass=mix(vec3(.10,.22,.045),vec3(.23,.34,.085),mottling);
-    vec3 beach=vec3(.76,.62,.39);
+    vec3 grass=mix(vec3(.12,.28,.052),vec3(.27,.40,.095),mottling);
+    vec3 beach=vec3(.82,.70,.47);
     float grassBreak=texture2D(islandGrain,vIslandSurface.xz*.018).r;
     float exposed=smoothstep(.57,.7,grassBreak)*smoothstep(10.,35.,vIslandSurface.y)*.34;
     vec3 inland=mix(grass,rock,max(cliff,exposed));

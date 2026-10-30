@@ -12,4 +12,4 @@ export class ControlPreferences {
   get downKey(){return this.inverted?'W':'S';}
 }
 
-export function remapPitchKeys(text:string,inverted:boolean){return inverted?text.replace(/(?<![A-Za-z'])\b[WS]\b/g,key=>key==='W'?'S':'W'):text;}
+export function remapPitchKeys(text:string,inverted:boolean){return inverted?text.replace(/(?<![A-Za-z'])\b[WS]\b(?!\.\d)/g,key=>key==='W'?'S':'W'):text;}

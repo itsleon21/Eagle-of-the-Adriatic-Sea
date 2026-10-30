@@ -17,7 +17,7 @@ export class PackedSunShadows{
  private shadowDirection=new T.Vector3();private cloudDirection=new T.Vector3();
  private rebuildCloudShadows(sun:T.Vector3){const size=64,data=this.cloudTexture.image.data as Uint8Array;const sy=Math.max(.08,sun.y);for(let z=0;z<size;z++)for(let x=0;x<size;x++){
   const wx=(x/(size-1)-.5)*22000,wz=(z/(size-1)-.5)*22000,acc=[0,0,0];
-  cloudCells.forEach((c,i)=>{const px=c.x-sun.x/sy*c.y,pz=c.z-sun.z/sy*c.y,dx=(wx-px)/(c.rx*1.1),dz=(wz-pz)/(c.rz*1.1),d=dx*dx+dz*dz;if(d<2.5){const v=Math.exp(-d*2)*.65;if(i<12)acc[0]+=v;if(i<20)acc[1]+=v;acc[2]+=v;}});
+  cloudCells.forEach((c,i)=>{const px=c.x-sun.x/sy*c.y,pz=c.z-sun.z/sy*c.y,dx=(wx-px)/(c.rx*1.1),dz=(wz-pz)/(c.rz*1.1),d=dx*dx+dz*dz;if(d<2.5){const v=Math.exp(-d*2)*(c.layer===2?.18:.65);if(i<12)acc[0]+=v;if(i<20)acc[1]+=v;acc[2]+=v;}});
   const k=(z*size+x)*4;for(let ch=0;ch<3;ch++)data[k+ch]=Math.round(Math.min(1,acc[ch])*255);data[k+3]=255;
  }this.cloudTexture.needsUpdate=true;this.cloudDirection.copy(sun);}
  setWeather(coverage:number,wind:number){this.coverage=coverage;this.wind=wind;}
