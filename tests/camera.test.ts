@@ -27,3 +27,17 @@ test('cockpit look can pan, clamp and recenter without moving the eye or aircraf
  rig.lookAround(1e9,1e9);rig.update(f,1,true);assert.ok(Number.isFinite(camera.quaternion.w));rig.recenter();rig.update(f,1,true);assert.ok(camera.quaternion.angleTo(forward)<1e-6);
  rig.lookAround(150,0);rig.cycle(f);while(rig.view.id!=='cockpit')rig.cycle(f);assert.ok(camera.quaternion.angleTo(forward)<1e-6);
 });
+
+test('fast looping, inverted turns and rolls remain framed at 30, 60 and 120 FPS in every external view',async()=>{
+ const {MC72FlightConfig}=await import('../src/aircraft/FlightConfig.ts');
+ for(const fps of[30,60,120])for(const mode of['chase','wide','side','overhead'])for(const maneuver of['loop','immelmann','roll']){
+  const f=new FlightController(true,MC72FlightConfig),camera=new PerspectiveCamera(55,16/9,.4,26000),rig=new ChaseCamera(camera);
+  f.position.set(0,500,0);rig.reset(f);while(rig.view.id!==mode)rig.cycle(f);
+  for(let i=0;i<fps*10;i++){
+   const t=i/fps,a=t*.85;f.position.set(0,500+130*(1-Math.cos(a)),-130*Math.sin(a));f.velocity.set(0,110*Math.sin(a),-110*Math.cos(a));
+   f.maneuver=maneuver==='roll'?null:maneuver;f.rolling=maneuver==='roll';if(maneuver==='immelmann'&&a>Math.PI)f.heading=Math.PI;
+   rig.update(f,1/fps);camera.updateMatrixWorld();const p=f.position.clone().project(camera);
+   assert.ok(Math.abs(p.x)<.8&&Math.abs(p.y)<.8&&p.z<1&&p.z> -1,`${mode} ${maneuver} ${fps} frame ${i}`);
+  }
+ }
+});

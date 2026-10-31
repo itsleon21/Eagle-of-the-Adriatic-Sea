@@ -2,11 +2,11 @@ import { Vector3 } from 'three';
 import {islands,harborRunway} from '../world/WorldConfig.ts';
 export interface Checkpoint { name:string; position:Vector3; normal:Vector3; radius:number }
 export const route:Checkpoint[]=[
- {name:'港湾出口',position:new Vector3(harborRunway.x+700,100,harborRunway.z),normal:new Vector3(1,0,0),radius:85},
- {name:'海岸小镇',position:new Vector3(islands[1].x+150,220,islands[1].z+820),normal:new Vector3(0,0,-1),radius:115},
- {name:'灯塔外海',position:new Vector3(islands[2].x+650,200,islands[2].z+500),normal:new Vector3(1,0,0),radius:95},
- {name:'返航海面',position:new Vector3(islands[2].x-900,105,islands[2].z+1000),normal:new Vector3(-.5,0,1).normalize(),radius:115},
- {name:'港口终点',position:new Vector3(harborRunway.x+400,55,harborRunway.z),normal:new Vector3(-1,0,0),radius:100},
+ {name:'港湾出口',position:new Vector3(harborRunway.x+700,100,harborRunway.z),normal:new Vector3(1,0,0),radius:60},
+ {name:'海岸小镇',position:new Vector3(islands[1].x+150,220,islands[1].z+820),normal:new Vector3(0,0,-1),radius:80},
+ {name:'灯塔外海',position:new Vector3(islands[2].x+650,200,islands[2].z+500),normal:new Vector3(1,0,0),radius:66},
+ {name:'返航海面',position:new Vector3(islands[2].x-900,105,islands[2].z+1000),normal:new Vector3(-.5,0,1).normalize(),radius:80},
+ {name:'港口终点',position:new Vector3(harborRunway.x+400,55,harborRunway.z),normal:new Vector3(-1,0,0),radius:70},
 ];
 export function crossesCheckpoint(from:Vector3,to:Vector3,checkpoint:Checkpoint){
  const a=from.clone().sub(checkpoint.position).dot(checkpoint.normal),b=to.clone().sub(checkpoint.position).dot(checkpoint.normal);

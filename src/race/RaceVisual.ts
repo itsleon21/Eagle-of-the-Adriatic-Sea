@@ -1,10 +1,16 @@
 import * as T from 'three';
 import {raceCourse} from './RaceManager.ts';
 import type {RaceManager} from './RaceManager.ts';
+import {FlightGate} from '../missions/FlightGate.ts';
 export class RaceVisual{
- readonly root=new T.Group();private rings:T.Mesh[]=[];
- constructor(){for(const c of raceCourse){const mesh=new T.Mesh(new T.TorusGeometry(c.radius,2.8,8,80),new T.MeshBasicMaterial({color:0xffd78b,transparent:true,opacity:.8}));mesh.position.copy(c.position);mesh.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),c.normal);this.root.add(mesh);this.rings.push(mesh);}}
- update(race:RaceManager){this.rings.forEach((r,i)=>{r.visible=!!race.current&&i===race.index;});}
+ readonly root=new T.Group();
+ private gates=raceCourse.map((point,i)=>new FlightGate(point,i===0?0xffc56b:0x73f1dc));
+ constructor(){this.root.name='Race / luminous course gates';this.root.add(...this.gates.map(g=>g.root));}
+ pass(index:number){this.gates[index]?.reset();}
+ reset(){this.gates.forEach(g=>g.reset());}
+ update(race:RaceManager,time:number){
+  this.gates.forEach((g,i)=>g.update(time,!!race.current&&i===race.index,false));
+ }
 }
 export class RaceFireworks{
  readonly points:T.Points;private clock=0;private playing=false;private positions:Float32Array;private velocities:Float32Array;private starts:Float32Array;

@@ -27,7 +27,7 @@ export class AircraftModel {
       make(new T.BoxGeometry(9.48,.13,1.6),paint,0,-.14,0);
       for(const side of[-1,1]){const f=make(new T.SphereGeometry(1,20,10),cream,side*1.18,-1.44,-.2);f.scale.set(.34,.38,3.25);make(new T.BoxGeometry(.05,1.25,.05),dark,side*1.18,-.7,-1);}
       make(new T.BoxGeometry(2.6,.08,.9),paint,0,.22,3.25);make(new T.BoxGeometry(.08,1.05,.85),paint,0,.65,3.45);
-      this.propeller.position.set(0,.22,-3.98);this.propeller.userData.rotation_direction=1;const rear=new T.Group();rear.position.set(0,.22,-3.72);rear.userData.rotation_direction=-1;this.propellers=[this.propeller,rear];for(const p of this.propellers){p.add(new T.Mesh(new T.BoxGeometry(.15,2.5,.045),dark));group.add(p);}return group;
+      this.propeller.position.set(0,.22,-4.04);this.propeller.userData.rotation_direction=1;const rear=new T.Group();rear.position.set(0,.22,-3.87);rear.userData.rotation_direction=-1;rear.rotation.z=Math.PI/2;this.propellers=[this.propeller,rear];for(const p of this.propellers){p.add(new T.Mesh(new T.BoxGeometry(.15,2.5,.045),dark));group.add(p);}return group;
     }
     make(new T.SphereGeometry(1,24,12),hullPaint,0,-.12,0).scale.set(.63,.57,plane.length/2);
     make(new T.SphereGeometry(1,20,10),cream,0,-.49,0).scale.set(.60,.48,3.8);

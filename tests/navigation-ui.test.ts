@@ -27,3 +27,25 @@ test('source aircraft with normal maps export finite perpendicular tangent frame
   assert.ok(checked>100);
  }
 });
+
+test('target bearing shares the compass scale and stays continuous across north and complete turns',async()=>{
+ const {targetBearing,navigationDistance}=await import('../src/ui/NavigationReadout.ts');
+ const target=(degrees:number)=>({name:'目标',kind:'mission' as const,position:{x:Math.sin(degrees*Math.PI/180)*1000,y:100,z:-Math.cos(degrees*Math.PI/180)*1000}});
+ for(const turns of[-8,0,12]){
+  const forward=targetBearing(-359*Math.PI/180+turns*2*Math.PI,0,0,target(1),160);
+  assert.ok(Math.abs(forward.delta-2)<1e-8);assert.ok(Math.abs(forward.offset-12)<1e-7);assert.equal(forward.edge,'ahead');
+  const left=targetBearing(-Math.PI/180+turns*2*Math.PI,0,0,target(359),160);
+  assert.ok(Math.abs(left.delta+2)<1e-8);assert.ok(Math.abs(left.offset+12)<1e-7);
+ }
+ assert.equal(navigationDistance(720),'720 m');assert.equal(navigationDistance(1250),'1.3 km');
+});
+
+test('offscreen and rear targets stay on the correct edge at desktop and compact compass widths',async()=>{
+ const {targetBearing}=await import('../src/ui/NavigationReadout.ts');
+ for(const halfWidth of[75,140,174])for(const [x,z,edge] of[[1000,0,'right'],[-1000,0,'left'],[200,1000,'right'],[-200,1000,'left']] as const){
+  const aim=targetBearing(0,0,0,{name:'航门',kind:'race',position:{x,y:100,z}},halfWidth);
+  assert.equal(aim.edge,edge);assert.equal(Math.abs(aim.offset),halfWidth-12);
+ }
+ const overhead=targetBearing(-Math.PI/2,20,30,{name:'栈桥',kind:'commission',position:{x:20,y:0,z:30}},90);
+ assert.ok(Number.isFinite(overhead.bearing));assert.equal(overhead.delta,0);assert.equal(overhead.offset,0);
+});

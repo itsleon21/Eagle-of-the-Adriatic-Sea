@@ -172,13 +172,35 @@ for o in [bpy.data.objects['Curved dorsal fin'],bpy.data.objects['Broad rounded 
  for poly in o.data.polygons:
   z=poly.center.z+(rud.location.z if o.parent==rud else 0)
   if abs(poly.normal.x)>.9 and 3.28<z<3.65:poly.material_index=1 if z<3.46 else 2
-# Coaxial, counter-rotating TWO-BLADE propellers on a shared axis.
-for i,z in enumerate([-3.98,-3.72]):
- pivot=bpy.data.objects.new('PropellerPivot' if i==0 else 'PropellerPivotRear',None);scene.collection.objects.link(pivot);pivot.parent=root;pivot.location=(0,.22,z);pivot['rotation_direction']=1 if i==0 else -1;pivot.rotation_euler[2]=0 if i==0 else math.pi*.43
+# Four visible blades: both rotor planes sit ahead of the cowl nose at Z=-3.76.
+# Rear rotor is offset 90 degrees for the parked four-blade silhouette.
+# The supplied side photograph shows tapered blades and a compact pointed metal spinner.
+for i,z in enumerate([-4.04,-3.87]):
+ pivot=bpy.data.objects.new('PropellerPivot' if i==0 else 'PropellerPivotRear',None);scene.collection.objects.link(pivot);pivot.parent=root;pivot.location=(0,.22,z);pivot['rotation_direction']=1 if i==0 else -1;pivot.rotation_euler[2]=0 if i==0 else math.pi/2
  for side in[-1,1]:
-  blade=ell('Metal racing propeller blade',(0,side*.68,0),(.115,.57,.026),alloy,pivot);blade.rotation_euler[1]=side*.18*(1 if i==0 else -1)
- if i==1:ell('Rear propeller hub',(0,0,-.018),(.14,.14,.07),alloy,pivot)
-ell('Pointed spinner',(0,.22,-4.02),(.195,.195,.14),cream)
+  stations=[(.12,.040,0),(.23,.070,.004),(.43,.109,.015),(.68,.119,.025),(.91,.092,.028),(1.10,.056,.018),(1.22,.023,.006),(1.25,.002,0)]
+  verts=[];faces=[];segments=12
+  for radius,chord,sweep in stations:
+   pitch=(.58-.38*radius/1.25)*(1 if i==0 else -1)
+   for j in range(segments):
+    angle=j/segments*math.tau;x=math.cos(angle)*chord;thick=math.sin(angle)*(.012*(1-radius/1.6))
+    verts.append((side*(sweep+x*math.cos(pitch)-thick*math.sin(pitch)),side*radius,x*math.sin(pitch)+thick*math.cos(pitch)))
+  for k in range(len(stations)-1):
+   for j in range(segments):
+    q=k*segments+j;n=k*segments+(j+1)%segments;faces.append((q,n,n+segments,q+segments))
+  faces.extend([tuple(range(segments-1,-1,-1)),tuple((len(stations)-1)*segments+j for j in range(segments))])
+  mesh('Metal racing propeller blade',verts,faces,alloy,pivot)
+ ell('Rear propeller hub' if i else 'Front propeller hub',(0,0,0),(.145,.145,.065),alloy,pivot)
+# Closed revolved spinner; no overlapping cream-coloured sphere at the shaft tip.
+verts=[];faces=[]
+for z,radius in [(-4.16,.002),(-4.13,.065),(-4.08,.116),(-4.02,.147),(-3.96,.15)]:
+ for j in range(48):
+  a=j/48*math.tau;verts.append((math.cos(a)*radius,.22+math.sin(a)*radius,z))
+for k in range(4):
+ for j in range(48):
+  q=k*48+j;n=k*48+(j+1)%48;faces.append((q,q+48,n+48,n))
+faces.extend([tuple(range(47,-1,-1)),tuple(192+j for j in range(48))])
+mesh('Pointed alloy spinner',verts,faces,alloy)
 # Discreet model registration, geometry lettering rather than a floating transparent decal.
 for side in[-1,1]:
  curve=bpy.data.curves.new('MC72 registration lettering','FONT');curve.body='MC.72';curve.size=.14;curve.extrude=.0005;o=bpy.data.objects.new('MC72 tail registration',curve);scene.collection.objects.link(o);o.parent=root;o.location=(side*.285,.30,2.10);o.rotation_euler=(0,side*math.pi/2,0);o.data.materials.append(white);bpy.context.view_layer.objects.active=o;o.select_set(True);bpy.ops.object.convert(target='MESH');o.select_set(False)

@@ -1,0 +1,28 @@
+/* Transparent navigation overlay keeps the horizon unobstructed. */
+body.is-playing .heading-system{
+ --target-ink:#ffda8f;top:24px;width:380px;padding:9px 15px 8px;
+ background:none;
+ border:0;border-radius:0;
+ box-shadow:none;
+ text-shadow:0 1px 3px #10232be6,0 0 8px #10232b80;
+}
+body.is-playing .heading-system[data-target=race]{--target-ink:#9df0dd}
+body.is-playing .heading-system[data-target=commission]{--target-ink:#eed6a4}
+body.is-playing .compass-meta{justify-content:space-between;gap:6px;flex-wrap:nowrap}
+body.is-playing .compass-meta b{font-size:21px;letter-spacing:.6px}
+body.is-playing #position-coordinates{font-size:9px;color:#d4c6aa;letter-spacing:.3px}
+body.is-playing .compass-window{margin-top:5px;height:43px;mask-image:none;border-bottom:1px solid #cfac6c24}
+body.is-playing .compass-tape{top:15px}
+body.is-playing .compass-index{top:15px;border-top-color:#f2e1c1}
+body.is-playing .compass-mark{color:#e0d0b3}
+body.is-playing .compass-target{position:absolute;top:0;left:50%;transform:translateX(-50%);color:var(--target-ink);font:12px/14px Georgia,serif;text-shadow:0 0 7px #d4b56377}
+body.is-playing .compass-target[data-edge=left],body.is-playing .compass-target[data-edge=right]{font:24px/12px Georgia,serif}
+body.is-playing .compass-objective{display:flex;gap:8px;align-items:center;min-width:0;padding-top:7px;color:var(--target-ink);font-size:10px;line-height:15px}
+body.is-playing .objective-kind{font-size:8px;letter-spacing:1px;opacity:.74;flex-shrink:0}
+body.is-playing .compass-objective b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+body.is-playing .objective-distance{margin-left:auto;white-space:nowrap;font:12px Georgia,serif;font-variant-numeric:tabular-nums}
+body.is-playing .compass-objective small{border-left:1px solid #ccac6b44;padding-left:8px;white-space:nowrap;font:9px Georgia,serif;color:#e3d3b3}
+@media(max-width:1150px){body.is-playing .heading-system{width:330px}body.is-playing #position-coordinates{font-size:7px}}
+@media(max-width:900px){body.is-playing .heading-system{left:18px;transform:none;top:18px;width:290px;padding:7px 12px}body.is-playing #position-coordinates{font-size:6px}body.is-playing .mission-panel,#race-status{top:140px}}
+@media(max-width:650px){body.is-playing .heading-system{top:13px;left:12px;width:190px;padding:5px 9px}body.is-playing .compass-meta{justify-content:center}body.is-playing .compass-meta b{font-size:18px}body.is-playing .compass-window{height:38px}body.is-playing .compass-objective{gap:5px;font-size:9px;padding-top:5px}body.is-playing .objective-distance{font-size:11px}body.is-playing .compass-objective small{display:none}body.is-playing .mission-panel,#race-status{top:132px}}
+@media(max-height:600px) and (min-width:901px){body.is-playing .heading-system{top:12px;padding-top:6px;padding-bottom:6px}}

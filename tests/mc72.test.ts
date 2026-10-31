@@ -12,7 +12,7 @@ test('MC72 model has true racing proportions, two long floats and coaxial contra
   if(n.mesh!==undefined)for(const p of g.meshes[n.mesh].primitives){const a=g.accessors[p.attributes.POSITION];box.union(new T.Box3(new T.Vector3().fromArray(a.min),new T.Vector3().fromArray(a.max)).applyMatrix4(matrix));}if(!box.isEmpty()){bounds.union(box);nodeBounds.set(n.name,box);}for(const child of n.children??[])walk(child,matrix);};walk(root,new T.Matrix4());
  const size=bounds.getSize(new T.Vector3());assert.ok(Math.abs(size.x-9.48)<.04);assert.ok(Math.abs(size.z-8.32)<.04);assert.ok(size.y>3.1&&size.y<3.5);
  const floats=[...nodeBounds.entries()].filter(([name])=>name.includes('stepped racing float'));assert.equal(floats.length,2);for(const [,box] of floats){assert.ok(box.getSize(new T.Vector3()).z>6.5);assert.ok(box.max.y<-.85);}
- const props=g.nodes.filter((n:{name:string})=>n.name.startsWith('PropellerPivot'));assert.equal(props.length,2);assert.deepEqual(props.map((n:{extras:{rotation_direction:number}})=>n.extras.rotation_direction).sort(),[-1,1]);assert.ok(Math.abs(props[0].translation[2]-props[1].translation[2])>.2);assert.equal(props[0].translation[0],props[1].translation[0]);
+ const props=g.nodes.filter((n:{name:string})=>n.name.startsWith('PropellerPivot'));assert.equal(props.length,2);assert.deepEqual(props.map((n:{extras:{rotation_direction:number}})=>n.extras.rotation_direction).sort(),[-1,1]);assert.ok(Math.abs(props[0].translation[2]-props[1].translation[2])>.12);assert.equal(props[0].translation[0],props[1].translation[0]);
 });
 test('removed aircraft cannot be selected or ship in the current static assets; old T12 links migrate',()=>{
  assert.deepEqual(aircraftCatalog.map(a=>a.id),['redwing','m5','mc72']);assert.equal(resolveAircraftId('','albatross'),'mc72');assert.equal(resolveAircraftId('','tern'),'redwing');
@@ -34,3 +34,10 @@ test('MC72 uses a full-depth fuselage and one wing skin for paint and radiators'
  for(const primitive of g.meshes[body.mesh].primitives){const vertices=read(primitive.attributes.POSITION),indices=read(primitive.indices);for(let i=0;i<indices.length;i+=3){const p=(j:number)=>new T.Vector3().fromArray(vertices,indices[i+j]*3),hit=ray.intersectTriangle(p(0),p(1),p(2),false,new T.Vector3());if(hit&&hit.y>-.5&&hit.y<.5)hits.push(hit.y);}}
  const unique=hits.filter((v,i)=>hits.findIndex(n=>Math.abs(n-v)<1e-5)===i);assert.equal(unique.length,2,`expected two wing skin crossings, got ${unique}`);
 });
+
+ test('both MC72 rotor planes and all four blade tips clear the engine cowl',()=>{
+ const data=readFileSync(new URL('../public/models/mc72.glb',import.meta.url));const g=JSON.parse(data.toString('utf8',20,20+data.readUInt32LE(12)));
+ const props=g.nodes.filter((n:any)=>n.name.startsWith('PropellerPivot'));let blades=0;
+ for(const p of props){assert.ok(p.translation[2]<-3.8);for(const child of p.children??[]){const n=g.nodes[child];if(!n.name.startsWith('Metal racing propeller blade'))continue;blades++;for(const primitive of g.meshes[n.mesh].primitives){const bounds=g.accessors[primitive.attributes.POSITION];assert.ok(p.translation[2]+(n.translation?.[2]??0)+bounds.max[2]<-3.78,'blade must remain ahead of cowl');}}}
+ assert.equal(blades,4);
+ });
